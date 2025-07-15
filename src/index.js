@@ -1,13 +1,30 @@
 const express = require("express");
-const app = express();
 require("dotenv").config();
-const mainRoute = require("./routes/index");
+const routes = require("./routes");
+const app = express();
 
+//connect to db
+const dbConnection = require("./utils/dbConnect");
+
+//models
+require("./models/index");
+
+//middlewares
 app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+app.use(express.static("public"));
 
-app.use("/", mainRoute);
+//routes
+app.use(routes);
 
-const PORT = process.env.PORT || 4000;
-app.listen(PORT, () => {
-  console.log("Listening on PORT", PORT);
-});
+(async () => {
+  try {
+    await dbConnection.sync({ force: false });
+    const PORT = process.env.PORT || 4001;
+    app.listen(PORT, () => {
+      console.log(`Server is running at ${PORT}`);
+    });
+  } catch (error) {
+    console.log(error);
+  }
+})();
