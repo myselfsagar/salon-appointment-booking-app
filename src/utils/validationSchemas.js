@@ -19,6 +19,30 @@ const validationSchemas = {
     email: joi.string().email().required(),
     password: joi.string().required(),
   }),
+  updateUser: joi.object({
+    firstName: joi.string(),
+    lastName: joi.string(),
+    phone: joi
+      .string()
+      .pattern(/^[0-9]{10}$/)
+      .messages({
+        "string.pattern.base": "Phone number must be exactly 10 digits.",
+      }),
+  }),
+  createService: joi.object({
+    name: joi.string().required(),
+    description: joi.string().required(),
+    duration: joi.number().required(),
+    price: joi.number().required(),
+    category: joi.string().required(),
+  }),
+  updateService: joi.object({
+    name: joi.string(),
+    description: joi.string(),
+    duration: joi.number(),
+    price: joi.number(),
+    category: joi.string(),
+  }),
 };
 
 module.exports = validationSchemas;

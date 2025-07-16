@@ -4,6 +4,11 @@ const userServices = require("../services/dbCall.js/userServices");
 const getMyProfile = async (req, res) => {
   try {
     const user = await userServices.getUserById(req.userId);
+
+    if (!user) {
+      return sendError(res, "No user found", 404);
+    }
+
     return sendSuccess(res, user, "Profile fetched");
   } catch (error) {
     console.log(error);
