@@ -1,6 +1,7 @@
 const express = require("express");
 require("dotenv").config();
 const routes = require("./routes");
+const errorMiddleware = require("./middlewares/errorMiddleware");
 const app = express();
 
 //connect to db
@@ -16,6 +17,7 @@ app.use(express.static("public"));
 
 //routes
 app.use(routes);
+app.use(errorMiddleware);
 
 (async () => {
   try {

@@ -1,33 +1,20 @@
-const { sendSuccess, sendError } = require("../utils/responseHandler");
+const { sendSuccess } = require("../utils/responseHandler");
 const userServices = require("../services/dbCall.js/userServices");
+const asyncHandler = require("../utils/asyncHandler");
+const ErrorHandler = require("../utils/errorHandler");
 
-const getMyProfile = async (req, res) => {
-  try {
-    const user = await userServices.getUserById(req.userId);
+const getMyProfile = asyncHandler(async (req, res, next) => {
+  const user = await userServices.getUserById(req.userId);
+  return sendSuccess(res, user, "Profile fetched");
+});
 
-    if (!user) {
-      return sendError(res, "No user found", 404);
-    }
+const updateMyProfile = asyncHandler(async (req, res, next) => {
+  const userData = req.body;
+  userData.id = req.userId;
+  const user = await userServices.updateMyProfile(userData);
 
-    return sendSuccess(res, user, "Profile fetched");
-  } catch (error) {
-    console.log(error);
-    return sendError(res, error.message);
-  }
-};
-
-const updateMyProfile = async (req, res) => {
-  try {
-    const userData = req.body;
-    userData.id = req.userId;
-    const user = await userServices.updateMyProfile(userData);
-
-    return sendSuccess(res, user, "profile updated successfully");
-  } catch (error) {
-    console.log(error);
-    return sendError(res, error.message);
-  }
-};
+  return sendSuccess(res, user, "profile updated successfully");
+});
 
 module.exports = {
   getMyProfile,

@@ -1,4 +1,5 @@
 const Service = require("../../models/Service");
+const ErrorHandler = require("../../utils/errorHandler");
 
 const createService = async (data) => {
   try {
@@ -21,7 +22,10 @@ const getAllServices = async ({ category }) => {
 
 const getServiceById = async (id) => {
   try {
-    return await Service.findByPk(id);
+    const service = await Service.findByPk(id);
+    if (!service) {
+      throw new ErrorHandler("Service not found", 404);
+    }
   } catch (error) {
     throw error;
   }

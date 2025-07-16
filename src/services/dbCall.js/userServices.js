@@ -1,4 +1,5 @@
 const User = require("../../models/User");
+const ErrorHandler = require("../../utils/errorHandler");
 
 const createUser = async (userData) => {
   try {
@@ -8,15 +9,26 @@ const createUser = async (userData) => {
   }
 };
 
+const getUserForAuth = async (email) => {
+  const user = await User.findOne({ where: { email } });
+  if (!user) {
+    throw new ErrorHandler("User not found", 404);
+  }
+  return user;
+};
+
 const getUserByEmail = async (email) => {
   try {
     const user = await User.findOne({
       where: { email },
     });
-    const userData = user.toJSON();
-    delete userData.password;
 
-    return userData;
+    if (!user) {
+      return null;
+    }
+    delete user.password;
+
+    return user;
   } catch (error) {
     throw error;
   }
@@ -25,10 +37,12 @@ const getUserByEmail = async (email) => {
 const getUserById = async (userId) => {
   try {
     const user = await User.findByPk(userId);
-    const userData = user.toJSON();
-    delete userData.password;
+    if (!user) {
+      throw new ErrorHandler("User not found", 404);
+    }
+    delete user.password;
 
-    return userData;
+    return user;
   } catch (error) {
     throw error;
   }
@@ -44,9 +58,9 @@ const updateMyProfile = async (data) => {
     // Update and return the updated user
     await User.update(updateFields, { where: { id: data.id } });
     const updatedUser = await User.findByPk(data.id);
-    const userData = updatedUser.toJSON();
-    delete userData.password;
-    return userData;
+
+    delete updatedUser.password;
+    return updatedUser;
   } catch (error) {
     throw error;
   }
@@ -54,6 +68,7 @@ const updateMyProfile = async (data) => {
 
 module.exports = {
   createUser,
+  getUserForAuth,
   getUserByEmail,
   getUserById,
   updateMyProfile,
