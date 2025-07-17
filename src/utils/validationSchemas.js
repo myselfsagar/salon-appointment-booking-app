@@ -43,6 +43,19 @@ const validationSchemas = {
     price: joi.number(),
     category: joi.string(),
   }),
+  createStaff: joi.object({
+    firstName: joi.string().required(),
+    lastName: joi.string().required(),
+    email: joi.string().email().required(),
+    phone: joi
+      .string()
+      .pattern(/^[0-9]{10}$/)
+      .messages({
+        "string.pattern.base": "Phone number must be exactly 10 digits.",
+      }),
+    specialization: joi.string(),
+    availability: joi.object(),
+  }),
 };
 
 module.exports = validationSchemas;
