@@ -41,15 +41,14 @@ const updateService = async (data) => {
     if (data.category) updateFields.category = data.category;
 
     // Update and return the updated user
-    await Service.update(updateFields, {
+    const [rowsUpdate, [updatedService]] = await Service.update(updateFields, {
       where: { id: data.serviceId },
+      returning: true,
     });
 
-    const updatedService = await getServiceById(data.serviceId);
     return updatedService;
   } catch (error) {
-    console.log(error);
-    return sendError(res, error.message);
+    throw error;
   }
 };
 
@@ -57,8 +56,7 @@ const deleteService = async (id) => {
   try {
     return await Service.destroy({ where: { id } });
   } catch (error) {
-    console.log(error);
-    return sendError(res, error.message);
+    throw error;
   }
 };
 

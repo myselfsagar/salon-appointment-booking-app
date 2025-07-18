@@ -1,7 +1,7 @@
 const sequelize = require("../../utils/dbConnect");
 const User = require("../../models/User");
 const StaffProfile = require("../../models/StaffProfile");
-const axios = require("axios");
+const emailService = require("../utils/emailService");
 
 const createStaff = async (staffData) => {
   const t = await sequelize.transaction();
@@ -30,10 +30,8 @@ const createStaff = async (staffData) => {
       { transaction: t }
     );
 
-    // Step 3: Send the reset password email
-    await axios.post(`${process.env.WEBSITE}/password/forgotPassword`, {
-      email: staffData.email,
-    });
+    // Step 3: Send the reset password email using the email service
+    await emailService.sendPasswordResetEmail(newUser);
 
     await t.commit();
 

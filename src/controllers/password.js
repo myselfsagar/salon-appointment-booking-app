@@ -4,54 +4,25 @@ const { sendSuccess } = require("../utils/responseHandler");
 const asyncHandler = require("../utils/asyncHandler");
 const ErrorHandler = require("../utils/errorHandler");
 const bcrypt = require("bcrypt");
-const Sib = require("sib-api-v3-sdk");
 const userServices = require("../services/dbCall.js/userServices");
 
-// Setup Sendinblue email client
-const client = Sib.ApiClient.instance;
-client.authentications["api-key"].apiKey = process.env.SIB_API_KEY;
-const tranEmailApi = new Sib.TransactionalEmailsApi();
+const sendPasswordResetEmailController = asyncHandler(
+  async (request, response, next) => {
+    const { email } = request.body;
+    if (!email) {
+      throw new ErrorHandler("Email is mandatory", 400);
+    }
 
-const sendPasswordResetEmail = asyncHandler(async (request, response, next) => {
-  const { email } = request.body;
-  if (!email) {
-    throw new ErrorHandler("Email is mandatory", 400);
+    const user = await userServices.getUserByEmail(email);
+    if (!user) {
+      throw new ErrorHandler("User not found", 404);
+    }
+
+    const mailresponse = await emailService.sendPasswordResetEmail(user);
+
+    return sendSuccess(response, mailresponse, "Password reset email sent");
   }
-
-  const user = await userServices.getUserByEmail(email);
-  if (!user) {
-    throw new ErrorHandler("User not found", 404);
-  }
-
-  const sender = { email: "ssahu6244@gmail.com", name: "From Admin SAGAR" };
-  const receivers = [{ email }];
-
-  const resetResponse = await ForgotPassword.create({ userId: user.id });
-  const { id } = resetResponse;
-
-  const mailresponse = await tranEmailApi.sendTransacEmail({
-    sender,
-    to: receivers,
-    subject: "Saloon Booking App - Reset Your password",
-    htmlContent: `
-              <!DOCTYPE html>
-                <html>
-                <head>
-                    <title>Password Reset</title>
-                </head>
-                <body>
-                    <h1>Reset Your Password</h1>
-                    <p>Click the button below to reset your password (Valid for 5 minute):</p><br>
-                    <button><a href="${process.env.WEBSITE}/password/resetPassword/{{params.role}}">Reset Password</a></button>
-                </body>
-                </html>`,
-    params: {
-      role: id,
-    },
-  });
-
-  return sendSuccess(response, mailresponse, "Password reset email sent");
-});
+);
 
 const verifyResetRequest = asyncHandler(async (request, response, next) => {
   let { resetId } = request.params;
@@ -90,7 +61,7 @@ const updatepassword = asyncHandler(async (request, response, next) => {
 });
 
 module.exports = {
-  sendPasswordResetEmail,
+  sendPasswordResetEmail: sendPasswordResetEmailController,
   verifyResetRequest,
   updatepassword,
 };
