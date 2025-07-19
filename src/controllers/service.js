@@ -26,10 +26,7 @@ const updateService = asyncHandler(async (req, res, next) => {
   const { id } = req.params;
   const userData = req.body;
 
-  const service = await serviceServices.getServiceById(id);
-  if (!service) {
-    throw new ErrorHandler("User not found", 404);
-  }
+  await serviceServices.getServiceById(id); //check if service exist
 
   const updatedService = await serviceServices.updateService({
     ...userData,
@@ -42,10 +39,7 @@ const updateService = asyncHandler(async (req, res, next) => {
 const deleteService = asyncHandler(async (req, res, next) => {
   const { id } = req.params;
 
-  const service = await serviceServices.getServiceById(id);
-  if (!service) {
-    throw new ErrorHandler("User not found", 404);
-  }
+  await serviceServices.getServiceById(id); //check if service exist
 
   const isDeleted = await serviceServices.deleteService(id);
 

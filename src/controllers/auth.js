@@ -10,7 +10,10 @@ const signupController = asyncHandler(async (req, res, next) => {
 
   const isUser = await userServices.getUserByEmail(email);
   if (isUser) {
-    throw new ErrorHandler("User already exist", 409);
+    throw new ErrorHandler(
+      "An account with this email address already exists.",
+      409
+    );
   }
 
   const hashedPassword = await bcrypt.hash(password, 10);

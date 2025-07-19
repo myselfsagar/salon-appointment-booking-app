@@ -13,4 +13,28 @@ router.post(
   staffController.createStaffMember
 );
 
+router.get("/", authMiddleware, staffController.getAllStaffs);
+
+router.get(
+  "/:id",
+  authMiddleware,
+  checkRole("staff", "admin"),
+  staffController.getStaffById
+);
+
+router.put(
+  "/:id",
+  authMiddleware,
+  checkRole("staff", "admin"),
+  validateRequest(schemas.updateStaff),
+  staffController.updateStaff
+);
+
+router.delete(
+  "/:id",
+  authMiddleware,
+  checkRole("staff", "admin"),
+  staffController.deleteStaff
+);
+
 module.exports = router;

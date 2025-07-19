@@ -5,6 +5,7 @@ const asyncHandler = require("../utils/asyncHandler");
 const ErrorHandler = require("../utils/errorHandler");
 const bcrypt = require("bcrypt");
 const userServices = require("../services/dbCall.js/userServices");
+const emailService = require("../services/emailService");
 
 const sendPasswordResetEmailController = asyncHandler(
   async (request, response, next) => {

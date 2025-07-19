@@ -50,6 +50,20 @@ const validationSchemas = {
     phone: joi
       .string()
       .pattern(/^[0-9]{10}$/)
+      .required()
+      .messages({
+        "string.pattern.base": "Phone number must be exactly 10 digits.",
+      }),
+    specialization: joi.string(),
+    availability: joi.object(),
+  }),
+  updateStaff: joi.object({
+    firstName: joi.string(),
+    lastName: joi.string(),
+    email: joi.string().email(),
+    phone: joi
+      .string()
+      .pattern(/^[0-9]{10}$/)
       .messages({
         "string.pattern.base": "Phone number must be exactly 10 digits.",
       }),
