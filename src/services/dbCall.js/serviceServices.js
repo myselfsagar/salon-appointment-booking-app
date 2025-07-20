@@ -26,6 +26,7 @@ const getServiceById = async (id) => {
     if (!service) {
       throw new ErrorHandler("Service not found", 404);
     }
+    return service;
   } catch (error) {
     throw error;
   }

@@ -1,12 +1,12 @@
 const Sib = require("sib-api-v3-sdk");
 const ForgotPassword = require("../models/ForgotPassword");
-const ErrorHandler = require("./errorHandler");
+const ErrorHandler = require("../utils/errorHandler");
 
 const client = Sib.ApiClient.instance;
 client.authentications["api-key"].apiKey = process.env.SIB_API_KEY;
 const tranEmailApi = new Sib.TransactionalEmailsApi();
 
-const sendPasswordResetEmail = async (user) => {
+const sendPasswordResetEmail = async (user, transaction = null) => {
   if (!user || !user.email || !user.id) {
     throw new ErrorHandler(
       "User details are required to send a password reset email.",
@@ -17,7 +17,10 @@ const sendPasswordResetEmail = async (user) => {
   const sender = { email: "ssahu6244@gmail.com", name: "From Admin SAGAR" };
   const receivers = [{ email: user.email }];
 
-  const resetResponse = await ForgotPassword.create({ userId: user.id });
+  const resetResponse = await ForgotPassword.create(
+    { userId: user.id },
+    { transaction }
+  );
   const { id } = resetResponse;
 
   const mailresponse = await tranEmailApi.sendTransacEmail({

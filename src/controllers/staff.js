@@ -45,10 +45,17 @@ const deleteStaff = asyncHandler(async (req, res, next) => {
   return sendSuccess(res, isDeleted, "Staff deleted", 204);
 });
 
+const assignService = asyncHandler(async (req, res, next) => {
+  const { staffId, serviceId } = req.params;
+  const result = await staffServices.assignServiceToStaff(staffId, serviceId);
+  sendSuccess(res, result, "Service assigned successfully");
+});
+
 module.exports = {
   createStaffMember,
   getAllStaffs,
   getStaffById,
   updateStaff,
   deleteStaff,
+  assignService,
 };

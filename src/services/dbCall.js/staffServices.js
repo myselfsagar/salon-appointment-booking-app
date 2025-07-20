@@ -1,7 +1,9 @@
 const sequelize = require("../../utils/dbConnect");
 const User = require("../../models/User");
 const StaffProfile = require("../../models/StaffProfile");
+const serviceServices = require("./serviceServices");
 const emailService = require("../emailService");
+const ErrorHandler = require("../../utils/errorHandler");
 
 const createStaff = async (staffData) => {
   const t = await sequelize.transaction();
@@ -31,7 +33,7 @@ const createStaff = async (staffData) => {
     );
 
     // Step 3: Send the reset password email using the email service
-    await emailService.sendPasswordResetEmail(newUser);
+    await emailService.sendPasswordResetEmail(newUser, t);
 
     await t.commit();
 
@@ -75,14 +77,12 @@ const updateStaff = async (data) => {
     if (data.availability) updateFields.availability = data.availability;
 
     // Update and return the updated user
-    const [rowsUpdate, [updatedStaff]] = await StaffProfile.update(
-      updateFields,
-      {
-        where: { id: data.staffId },
-        returning: true,
-      }
-    );
+    const rowsUpdate = await StaffProfile.update(updateFields, {
+      where: { id: data.staffId },
+    });
 
+    // Fetch and return the updated staff profile
+    const updatedStaff = await StaffProfile.findByPk(data.staffId);
     return updatedStaff;
   } catch (error) {
     throw error;
@@ -97,10 +97,27 @@ const deleteStaff = async (id) => {
   }
 };
 
+const assignServiceToStaff = async (staffId, serviceId) => {
+  const t = await sequelize.transaction();
+  try {
+    const staff = await getStaffById(staffId);
+    const service = await serviceServices.getServiceById(serviceId);
+
+    const stffService = await staff.addService(service, { transaction: t });
+
+    await t.commit();
+    return stffService;
+  } catch (error) {
+    await t.rollback();
+    throw error;
+  }
+};
+
 module.exports = {
   createStaff,
   getAllStaffs,
   getStaffById,
   updateStaff,
   deleteStaff,
+  assignServiceToStaff,
 };

@@ -37,4 +37,11 @@ router.delete(
   staffController.deleteStaff
 );
 
+router.post(
+  "/:staffId/services/:serviceId",
+  authMiddleware,
+  checkRole("admin"),
+  staffController.assignService
+);
+
 module.exports = router;
