@@ -41,11 +41,11 @@ const updateService = async (data) => {
     if (data.price) updateFields.price = data.price;
     if (data.category) updateFields.category = data.category;
 
-    // Update and return the updated user
-    const [rowsUpdate, [updatedService]] = await Service.update(updateFields, {
+    const rowsUpdate = await Service.update(updateFields, {
       where: { id: data.serviceId },
-      returning: true,
     });
+
+    const updatedService = await Service.findByPk(data.serviceId);
 
     return updatedService;
   } catch (error) {

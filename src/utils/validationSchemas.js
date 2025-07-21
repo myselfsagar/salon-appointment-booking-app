@@ -70,6 +70,10 @@ const validationSchemas = {
     specialization: joi.string(),
     availability: joi.object(),
   }),
+  createAppointment: joi.object({
+    serviceId: joi.number().integer().required(),
+    appointmentDateTime: joi.date().iso().required(),
+  }),
 };
 
 module.exports = validationSchemas;

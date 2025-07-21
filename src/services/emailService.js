@@ -44,6 +44,43 @@ const sendPasswordResetEmail = async (user, transaction = null) => {
   return mailresponse;
 };
 
+const sendBookingConfirmationEmail = async (user, appointmentDetails) => {
+  const sender = { email: "ssahu6244@gmail.com", name: "From Admin SAGAR" };
+  const receivers = [{ email: user.email }];
+
+  const serviceName = appointmentDetails.service.name;
+  const staffName = `${appointmentDetails.staff_profile.user.firstName} ${appointmentDetails.staff_profile.user.lastName}`;
+  const formattedDate = new Date(
+    appointmentDetails.appointmentDateTime
+  ).toLocaleString();
+
+  await tranEmailApi.sendTransacEmail({
+    sender,
+    to: receivers,
+    subject: "Your Appointment is Confirmed!",
+    htmlContent: `
+      <!DOCTYPE html>
+      <html>
+      <head>
+          <title>Appointment Confirmation</title>
+      </head>
+      <body>
+          <h1>Your Booking is Confirmed!</h1>
+          <p>Hi ${user.firstName},</p>
+          <p>Here are the details of your appointment:</p>
+          <ul>
+              <li><strong>Service:</strong> ${serviceName}</li>
+              <li><strong>With:</strong> ${staffName}</li>
+              <li><strong>Date & Time:</strong> ${formattedDate}</li>
+          </ul>
+          <p>We look forward to seeing you!</p>
+      </body>
+      </html>
+    `,
+  });
+};
+
 module.exports = {
   sendPasswordResetEmail,
+  sendBookingConfirmationEmail,
 };
