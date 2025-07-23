@@ -26,7 +26,7 @@ const signupController = asyncHandler(async (req, res, next) => {
     password: hashedPassword,
   });
 
-  return sendSuccess(res, "Signup successful", 201);
+  return sendSuccess(res, {}, "Signup successful", 201);
 });
 
 const loginController = asyncHandler(async (req, res, next) => {
