@@ -1,0 +1,299 @@
+/* Basic Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  height: 100%;
+}
+
+body {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  font-family: Arial, sans-serif;
+  line-height: 1.6;
+}
+
+main {
+  flex-grow: 1;
+  padding-top: 2rem;
+}
+
+header {
+  background: #333;
+  color: #fff;
+  padding: 0.7rem 0;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 90%;
+  margin: auto;
+}
+
+nav .logo {
+  display: flex;
+  align-items: center;
+}
+
+nav .logo img {
+  height: 50px;
+  margin-right: 10px;
+}
+
+nav ul {
+  list-style: none;
+  display: flex;
+}
+
+nav ul li {
+  margin-left: 20px;
+}
+
+nav a {
+  color: #fff;
+  text-decoration: none;
+}
+
+.hero {
+  text-align: center;
+  padding: 4rem 0;
+}
+
+.btn {
+  display: inline-block;
+  background: #f7c08a;
+  color: #333;
+  padding: 10px 20px;
+  text-decoration: none;
+  border-radius: 5px;
+  margin-top: 1rem;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+/* Modal Styles */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-content {
+  background-color: #fefefe;
+  margin: 7% auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%;
+  max-width: 400px;
+  border-radius: 10px;
+  position: relative;
+  text-align: center;
+}
+
+.close-btn {
+  color: #aaa;
+  position: absolute;
+  top: 10px;
+  right: 25px;
+  font-size: 35px;
+  font-weight: bold;
+}
+
+.close-btn:hover,
+.close-btn:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+/* Form Styles */
+.form-group {
+  margin-bottom: 15px;
+  text-align: left;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.form-switch {
+  margin-top: 20px;
+}
+
+.form-switch-forgot-password {
+  text-align: right;
+  margin-bottom: 10px;
+  font-size: 0.9em;
+}
+
+.nav-button {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 0;
+}
+.form-message {
+  margin-top: 15px;
+  padding: 10px;
+  border-radius: 5px;
+  display: none;
+}
+
+.form-message.success {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.form-message.error {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+/* My Profile styling */
+.profile-page {
+  width: 90%;
+  max-width: 700px;
+  margin: auto;
+}
+
+.profile-page h2 {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.profile-container {
+  background: #f9f9f9;
+  padding: 2rem;
+  border-radius: 8px;
+  margin-bottom: 3rem;
+}
+
+#profile-form input[disabled] {
+  background-color: #e9ecef;
+  cursor: not-allowed;
+}
+
+/* Service styling */
+
+.services-page {
+  width: 90%;
+  margin: auto;
+  padding: 2rem 0;
+}
+
+.services-page h2 {
+  text-align: center;
+  margin-bottom: 2rem;
+  font-size: 2.5rem;
+}
+
+.services-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.service-card {
+  background: #f4f4f4;
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+}
+
+.service-card h3 {
+  margin-bottom: 0.5rem;
+  color: #333;
+}
+
+.service-card p {
+  flex-grow: 1; /* Pushes details and button down */
+  margin-bottom: 1rem;
+}
+
+.service-details {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  font-weight: bold;
+  color: #555;
+}
+
+.book-service-btn {
+  align-self: center; /* Aligns button to the left */
+  font-weight: bold;
+  cursor: pointer;
+}
+
+/* Booking styling*/
+.booking-page {
+  width: 90%;
+  max-width: 600px;
+  margin: auto;
+  padding: 2rem 0;
+  text-align: center;
+}
+
+#service-details-container {
+  background-color: #f9f9f9;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 2rem;
+}
+
+.booking-form .form-group {
+  margin-bottom: 1.5rem;
+}
+
+#slots-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+.slot-btn {
+  background-color: #007bff;
+  color: white;
+  cursor: pointer;
+}
+
+.slot-btn:hover {
+  background-color: #0056b3;
+}
+
+/* Footer Styles */
+footer {
+  text-align: center;
+  padding: 0.7rem 0;
+  background: #333;
+  color: #fff;
+  margin-top: 2rem;
+}

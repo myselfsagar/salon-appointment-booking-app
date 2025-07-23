@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Profile - Sagar's Salon & Spa</title>
+    <link rel="stylesheet" href="/css/style.css" />
+  </head>
+  <body>
+    <header>
+      <nav>
+        <div class="logo">
+          <img src="/images/logo.png" alt="Logo" />
+          <h1>Sagar's Salon & Spa</h1>
+        </div>
+        <ul id="nav-links">
+          <li><a href="/">Home</a></li>
+          <li><a href="/services.html">Services</a></li>
+          <li class="logged-in" style="display: none">
+            <a href="/profile.html">My Profile</a>
+          </li>
+          <li class="logged-in" style="display: none">
+            <button id="logout-btn" class="nav-button">Logout</button>
+          </li>
+        </ul>
+      </nav>
+    </header>
+
+    <main>
+      <section class="profile-page">
+        <h2>My Profile</h2>
+        <div id="profile-container" class="profile-container">
+          <p>Loading profile...</p>
+        </div>
+
+        <h2>My Appointments</h2>
+        <div id="appointments-container">
+          <p>Loading appointments...</p>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <p>&copy; 2025 Sagar's Salon & Spa. All Rights Reserved.</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/profile.js"></script>
+  </body>
+</html>
