@@ -68,21 +68,43 @@ const getStaffById = async (staffId) => {
 
 const updateStaff = async (data) => {
   try {
-    const updateFields = {};
-    if (data.firstName) updateFields.firstName = data.firstName;
-    if (data.lastName) updateFields.lastName = data.lastName;
-    if (data.email) updateFields.email = data.email;
-    if (data.phone) updateFields.phone = data.phone;
-    if (data.specialization) updateFields.specialization = data.specialization;
-    if (data.availability) updateFields.availability = data.availability;
+    const staffProfile = await StaffProfile.findByPk(data.staffId);
+    if (!staffProfile) {
+      throw new ErrorHandler("Staff not found", 404);
+    }
 
-    // Update and return the updated user
-    const rowsUpdate = await StaffProfile.update(updateFields, {
-      where: { id: data.staffId },
-    });
+    const user = await User.findByPk(staffProfile.userId);
+    if (!user) {
+      throw new ErrorHandler("Associated user not found", 404);
+    }
+
+    // --- Update User Model ---
+    const userUpdateFields = {};
+    if (data.firstName) userUpdateFields.firstName = data.firstName;
+    if (data.lastName) userUpdateFields.lastName = data.lastName;
+    if (data.email) userUpdateFields.email = data.email;
+    if (data.phone) userUpdateFields.phone = data.phone;
+
+    if (Object.keys(userUpdateFields).length > 0) {
+      await user.update(userUpdateFields);
+    }
+
+    // --- Update StaffProfile Model ---
+    const staffProfileUpdateFields = {};
+    if (data.specialization)
+      staffProfileUpdateFields.specialization = data.specialization;
+    if (data.availability)
+      staffProfileUpdateFields.availability = data.availability;
+
+    if (Object.keys(staffProfileUpdateFields).length > 0) {
+      await staffProfile.update(staffProfileUpdateFields);
+    }
 
     // Fetch and return the updated staff profile
-    const updatedStaff = await StaffProfile.findByPk(data.staffId);
+    const updatedStaff = await StaffProfile.findByPk(data.staffId, {
+      include: [User], // Include user data in the response
+    });
+
     return updatedStaff;
   } catch (error) {
     throw error;

@@ -13,7 +13,7 @@ router.post(
   serviceControllers.createService
 );
 
-router.get("/", authMiddleware, serviceControllers.getAllServices);
+router.get("/", serviceControllers.getAllServices);
 
 router.get("/:id", authMiddleware, serviceControllers.getServiceById);
 

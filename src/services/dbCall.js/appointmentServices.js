@@ -132,7 +132,8 @@ const findAvailableSlots = async (date, serviceId) => {
     generateSlotsForStaff(staff, service, date, appointments, dayOfWeek)
   );
 
-  return allSlots.sort();
+  const uniqueSlots = [...new Set(allSlots)];
+  return uniqueSlots.sort();
 };
 
 const bookAppointment = async (bookingData) => {
