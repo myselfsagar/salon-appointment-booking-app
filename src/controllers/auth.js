@@ -45,7 +45,12 @@ const loginController = asyncHandler(async (req, res, next) => {
     { expiresIn: "1d" }
   );
 
-  return sendSuccess(res, { access_token }, "Login successful");
+  const responseData = {
+    access_token,
+    role: user.role,
+  };
+
+  return sendSuccess(res, responseData, "Login successful");
 });
 
 const logoutController = asyncHandler(async (req, res, next) => {

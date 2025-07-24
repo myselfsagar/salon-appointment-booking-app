@@ -38,9 +38,22 @@ document.addEventListener("DOMContentLoaded", () => {
   function updateNavUI(isLoggedIn) {
     const loggedInElements = document.querySelectorAll(".logged-in");
     const loggedOutElements = document.querySelectorAll(".logged-out");
+    const userRole = localStorage.getItem("userRole");
 
     if (isLoggedIn) {
-      loggedInElements.forEach((el) => (el.style.display = "list-item"));
+      loggedInElements.forEach((el) => {
+        if (el.classList.contains("customer-link") && userRole !== "customer") {
+          el.style.display = "none";
+        } else if (
+          el.classList.contains("admin-link") &&
+          userRole !== "admin" &&
+          userRole !== "staff"
+        ) {
+          el.style.display = "none";
+        } else {
+          el.style.display = "list-item";
+        }
+      });
       loggedOutElements.forEach((el) => (el.style.display = "none"));
     } else {
       loggedInElements.forEach((el) => (el.style.display = "none"));
@@ -53,7 +66,8 @@ document.addEventListener("DOMContentLoaded", () => {
   elements.signupBtn?.addEventListener("click", () => openModal("signup"));
   elements.logoutBtn?.addEventListener("click", () => {
     localStorage.removeItem("accessToken");
-    window.location.href = "/"; // Redirect to home on logout
+    localStorage.removeItem("userRole");
+    window.location.href = "/";
   });
 
   elements.closeBtn?.addEventListener("click", closeModal);

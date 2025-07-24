@@ -66,9 +66,20 @@ document.addEventListener("DOMContentLoaded", () => {
     const data = getFormData(elements.loginForm);
     try {
       const response = await axios.post("/auth/login", data);
-      localStorage.setItem("accessToken", response.data.data.access_token);
-      showMessage("Login successful!");
-      window.location.reload(); // Reload the page to update UI correctly
+      const { access_token, role } = response.data.data;
+
+      // Store the token
+      localStorage.setItem("accessToken", access_token);
+      localStorage.setItem("userRole", role);
+
+      showMessage("Login successful! Redirecting...");
+
+      // Redirect based on role
+      if (role === "admin" || role === "staff") {
+        window.location.href = "/admin/staff.html";
+      } else {
+        window.location.href = "/"; // Redirect customers to the homepage
+      }
     } catch (error) {
       showMessage(
         error.response?.data?.message || "Invalid credentials.",

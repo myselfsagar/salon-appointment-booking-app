@@ -46,7 +46,14 @@ const createStaff = async (staffData) => {
 
 const getAllStaffs = async () => {
   try {
-    return await StaffProfile.findAll();
+    return await StaffProfile.findAll({
+      include: [
+        {
+          model: User,
+          attributes: ["firstName", "lastName"],
+        },
+      ],
+    });
   } catch (error) {
     throw error;
   }
@@ -54,11 +61,17 @@ const getAllStaffs = async () => {
 
 const getStaffById = async (staffId) => {
   try {
-    const staff = await StaffProfile.findByPk(staffId);
+    const staff = await StaffProfile.findByPk(staffId, {
+      include: [{ model: User }],
+    });
+
     if (!staff) {
       throw new ErrorHandler("Staff not found", 404);
     }
-    delete staff.password;
+
+    if (staff.user && staff.user.password) {
+      delete staff.user.password;
+    }
 
     return staff;
   } catch (error) {
