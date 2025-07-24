@@ -289,6 +289,45 @@ nav a {
   background-color: #0056b3;
 }
 
+/* Appointment styling */
+#appointments-container {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+.appointment-card {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.appointment-card h4 {
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+.appointment-card p {
+  margin: 0.5rem 0;
+}
+
+.appointment-card .status-scheduled {
+  color: #007bff;
+  font-weight: bold;
+}
+
+.appointment-card .status-completed {
+  color: #28a745;
+  font-weight: bold;
+}
+
+.appointment-card .status-cancelled {
+  color: #dc3545;
+  font-weight: bold;
+}
+
 /* Footer Styles */
 footer {
   text-align: center;

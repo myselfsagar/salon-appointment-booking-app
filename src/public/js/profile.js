@@ -6,6 +6,9 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   const profileContainer = document.getElementById("profile-container");
+  const appointmentsContainer = document.getElementById(
+    "appointments-container"
+  );
 
   async function fetchProfile() {
     try {
@@ -72,5 +75,53 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  async function fetchAppointments() {
+    try {
+      const response = await axios.get("/appointments/me", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      renderAppointments(response.data.data);
+    } catch (error) {
+      appointmentsContainer.innerHTML = "<p>Could not load appointments.</p>";
+    }
+  }
+
+  function renderAppointments(appointments) {
+    if (appointments.length === 0) {
+      appointmentsContainer.innerHTML =
+        "<p>You have no appointments scheduled.</p>";
+      return;
+    }
+
+    appointmentsContainer.innerHTML = appointments
+      .map((app) => {
+        const staffName = app.staff_profile
+          ? `${app.staff_profile.user.firstName} ${app.staff_profile.user.lastName}`
+          : "N/A";
+        const appointmentDate = new Date(
+          app.appointmentDateTime
+        ).toLocaleDateString("en-IN", { timeZone: "Asia/Kolkata" });
+        const appointmentTime = new Date(
+          app.appointmentDateTime
+        ).toLocaleTimeString("en-IN", {
+          timeZone: "Asia/Kolkata",
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+
+        return `
+                <div class="appointment-card">
+                    <h4>${app.service.name}</h4>
+                    <p><strong>Date:</strong> ${appointmentDate}</p>
+                    <p><strong>Time:</strong> ${appointmentTime}</p>
+                    <p><strong>With:</strong> ${staffName}</p>
+                    <p><strong>Status:</strong> <span class="status-${app.status}">${app.status}</span></p>
+                </div>
+            `;
+      })
+      .join("");
+  }
+
   fetchProfile();
+  fetchAppointments();
 });
