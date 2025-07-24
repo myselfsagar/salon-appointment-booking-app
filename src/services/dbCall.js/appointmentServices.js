@@ -9,21 +9,39 @@ const {
   isSlotAvailable,
 } = require("../../utils/Helper/appointmentHelper");
 
-const getAppointmentDetails = async (appointmentId) => {
-  const appointment = await Appointment.findByPk(appointmentId, {
-    include: [
-      { model: User, attributes: ["id", "firstName", "lastName", "email"] },
-      {
-        model: StaffProfile,
-        include: [{ model: User, attributes: ["firstName", "lastName"] }],
-      },
-      { model: Service },
-    ],
+const findAvailableSlots = async (date, serviceId) => {
+  const service = await Service.findByPk(serviceId);
+  if (!service) throw new ErrorHandler("Service not found", 404);
+
+  const capableStaff = await StaffProfile.findAll({
+    include: [{ model: Service, where: { id: serviceId }, attributes: [] }],
   });
-  if (!appointment) {
-    throw new ErrorHandler("Appointment not found", 404);
-  }
-  return appointment;
+  if (capableStaff.length === 0) return [];
+
+  const staffIds = capableStaff.map((s) => s.id);
+  const appointments = await Appointment.findAll({
+    where: {
+      staffId: { [Op.in]: staffIds },
+      status: "scheduled",
+      appointmentDateTime: {
+        [Op.gte]: toDate(date),
+        [Op.lt]: new Date(toDate(date).getTime() + 24 * 60 * 60 * 1000),
+      },
+    },
+    include: [{ model: Service, attributes: ["duration"] }],
+    order: [["appointmentDateTime", "ASC"]],
+  });
+
+  const dayOfWeek = toDate(date)
+    .toLocaleString("en-US", { weekday: "long" })
+    .toLowerCase();
+
+  const allSlots = capableStaff.flatMap((staff) =>
+    generateSlotsForStaff(staff, service, date, appointments, dayOfWeek)
+  );
+
+  const uniqueSlots = [...new Set(allSlots)];
+  return uniqueSlots.sort();
 };
 
 const findFirstAvailableStaff = async (serviceId, appointmentDateTime) => {
@@ -101,41 +119,6 @@ const findFirstAvailableStaff = async (serviceId, appointmentDateTime) => {
   return null; // No available staff found
 };
 
-const findAvailableSlots = async (date, serviceId) => {
-  const service = await Service.findByPk(serviceId);
-  if (!service) throw new ErrorHandler("Service not found", 404);
-
-  const capableStaff = await StaffProfile.findAll({
-    include: [{ model: Service, where: { id: serviceId }, attributes: [] }],
-  });
-  if (capableStaff.length === 0) return [];
-
-  const staffIds = capableStaff.map((s) => s.id);
-  const appointments = await Appointment.findAll({
-    where: {
-      staffId: { [Op.in]: staffIds },
-      status: "scheduled",
-      appointmentDateTime: {
-        [Op.gte]: toDate(date),
-        [Op.lt]: new Date(toDate(date).getTime() + 24 * 60 * 60 * 1000),
-      },
-    },
-    include: [{ model: Service, attributes: ["duration"] }],
-    order: [["appointmentDateTime", "ASC"]],
-  });
-
-  const dayOfWeek = toDate(date)
-    .toLocaleString("en-US", { weekday: "long" })
-    .toLowerCase();
-
-  const allSlots = capableStaff.flatMap((staff) =>
-    generateSlotsForStaff(staff, service, date, appointments, dayOfWeek)
-  );
-
-  const uniqueSlots = [...new Set(allSlots)];
-  return uniqueSlots.sort();
-};
-
 const bookAppointment = async (bookingData) => {
   const { customerId, serviceId, appointmentDateTime } = bookingData;
   const availableStaff = await findFirstAvailableStaff(
@@ -181,9 +164,46 @@ function generateSlotsForStaff(staff, service, date, appointments, dayOfWeek) {
   return slots;
 }
 
+const getAppointmentDetails = async (appointmentId) => {
+  const appointment = await Appointment.findByPk(appointmentId, {
+    include: [
+      { model: User, attributes: ["id", "firstName", "lastName", "email"] },
+      {
+        model: StaffProfile,
+        include: [{ model: User, attributes: ["firstName", "lastName"] }],
+      },
+      { model: Service },
+    ],
+  });
+  if (!appointment) {
+    throw new ErrorHandler("Appointment not found", 404);
+  }
+  return appointment;
+};
+
+const getAppointmentsByCustomerId = async (customerId) => {
+  try {
+    const appointments = await Appointment.findAll({
+      where: { customerId: customerId },
+      include: [
+        { model: Service, attributes: ["name", "duration", "price"] },
+        {
+          model: StaffProfile,
+          include: [{ model: User, attributes: ["firstName", "lastName"] }],
+        },
+      ],
+      order: [["appointmentDateTime", "DESC"]], // Show most recent first
+    });
+    return appointments;
+  } catch (error) {
+    throw error;
+  }
+};
+
 module.exports = {
   findAvailableSlots,
   findFirstAvailableStaff,
   bookAppointment,
   getAppointmentDetails,
+  getAppointmentsByCustomerId,
 };
