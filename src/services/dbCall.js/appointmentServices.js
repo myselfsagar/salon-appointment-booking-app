@@ -200,10 +200,30 @@ const getAppointmentsByCustomerId = async (customerId) => {
   }
 };
 
+const getAllAppointments = async () => {
+  try {
+    const appointments = await Appointment.findAll({
+      include: [
+        { model: Service, attributes: ["name"] },
+        {
+          model: StaffProfile,
+          include: [{ model: User, attributes: ["firstName", "lastName"] }],
+        },
+        { model: User, as: "user", attributes: ["firstName", "lastName"] },
+      ],
+      order: [["appointmentDateTime", "DESC"]],
+    });
+    return appointments;
+  } catch (error) {
+    throw error;
+  }
+};
+
 module.exports = {
   findAvailableSlots,
   findFirstAvailableStaff,
   bookAppointment,
   getAppointmentDetails,
   getAppointmentsByCustomerId,
+  getAllAppointments,
 };

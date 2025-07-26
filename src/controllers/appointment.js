@@ -65,9 +65,15 @@ const getMyAppointments = asyncHandler(async (req, res, next) => {
   sendSuccess(res, appointments, "Your appointments fetched successfully");
 });
 
+const getAllAppointmentsAdmin = asyncHandler(async (req, res, next) => {
+  const appointments = await appointmentServices.getAllAppointments();
+  sendSuccess(res, appointments, "All appointments fetched");
+});
+
 module.exports = {
   getAvailableSlots,
   createAppointment,
   getAppointmentById,
   getMyAppointments,
+  getAllAppointmentsAdmin,
 };
