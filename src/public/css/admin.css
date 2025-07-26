@@ -75,3 +75,15 @@
   border-radius: 8px;
   margin-bottom: 1rem;
 }
+
+.status-updater {
+  margin-top: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.status-updater select {
+  padding: 5px;
+  border-radius: 5px;
+}
