@@ -66,3 +66,12 @@
   font-size: 0.9em;
   color: #555;
 }
+
+/* appointment styling */
+.appointment-admin-card {
+  background: #fff;
+  border: 1px solid #ddd;
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
