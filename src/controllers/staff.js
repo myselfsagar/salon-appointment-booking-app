@@ -51,6 +51,12 @@ const assignService = asyncHandler(async (req, res, next) => {
   sendSuccess(res, result, "Service assigned successfully");
 });
 
+const unassignService = asyncHandler(async (req, res, next) => {
+  const { staffId, serviceId } = req.params;
+  await staffServices.unassignServiceFromStaff(staffId, serviceId);
+  sendSuccess(res, {}, "Service unassigned successfully");
+});
+
 module.exports = {
   createStaffMember,
   getAllStaffs,
@@ -58,4 +64,5 @@ module.exports = {
   updateStaff,
   deleteStaff,
   assignService,
+  unassignService,
 };

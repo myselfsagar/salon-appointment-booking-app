@@ -62,7 +62,7 @@ const getAllStaffs = async () => {
 const getStaffById = async (staffId) => {
   try {
     const staff = await StaffProfile.findByPk(staffId, {
-      include: [{ model: User }],
+      include: [{ model: User }, { model: Service }],
     });
 
     if (!staff) {
@@ -148,6 +148,17 @@ const assignServiceToStaff = async (staffId, serviceId) => {
   }
 };
 
+const unassignServiceFromStaff = async (staffId, serviceId) => {
+  try {
+    const staff = await getStaffById(staffId);
+    const service = await serviceServices.getServiceById(serviceId);
+    const result = await staff.removeService(service);
+    return result;
+  } catch (error) {
+    throw error;
+  }
+};
+
 module.exports = {
   createStaff,
   getAllStaffs,
@@ -155,4 +166,5 @@ module.exports = {
   updateStaff,
   deleteStaff,
   assignServiceToStaff,
+  unassignServiceFromStaff,
 };

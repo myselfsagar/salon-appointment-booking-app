@@ -54,7 +54,7 @@ const validationSchemas = {
       .messages({
         "string.pattern.base": "Phone number must be exactly 10 digits.",
       }),
-    specialization: joi.string(),
+    specialization: joi.string().allow(""),
     availability: joi.object(),
   }),
   updateStaff: joi.object({
@@ -67,7 +67,7 @@ const validationSchemas = {
       .messages({
         "string.pattern.base": "Phone number must be exactly 10 digits.",
       }),
-    specialization: joi.string(),
+    specialization: joi.string().allow(""),
     availability: joi.object(),
   }),
   createAppointment: joi.object({
