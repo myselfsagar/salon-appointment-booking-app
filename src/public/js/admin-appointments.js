@@ -8,12 +8,23 @@ document.addEventListener("DOMContentLoaded", () => {
   const appointmentListContainer = document.getElementById(
     "appointment-list-container"
   );
+  const dateFilter = document.getElementById("date-filter");
 
   async function fetchAppointments() {
     try {
-      const response = await axios.get("/appointments", {
+      const selectedDate = dateFilter.value;
+
+      // Build the params for the API call
+      const config = {
         headers: { Authorization: `Bearer ${token}` },
-      });
+        params: {},
+      };
+
+      if (selectedDate) {
+        config.params.date = selectedDate;
+      }
+
+      const response = await axios.get("/appointments", config);
       renderAppointmentList(response.data.data);
     } catch (error) {
       appointmentListContainer.innerHTML =
@@ -94,5 +105,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
+  dateFilter.addEventListener("change", fetchAppointments);
   fetchAppointments();
 });

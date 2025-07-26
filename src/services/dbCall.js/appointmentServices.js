@@ -200,9 +200,24 @@ const getAppointmentsByCustomerId = async (customerId) => {
   }
 };
 
-const getAllAppointments = async () => {
+const getAllAppointments = async (date) => {
   try {
+    const whereCondition = {};
+
+    // If a date is provided, filter appointments for that specific day
+    if (date) {
+      const startDate = new Date(date);
+      startDate.setHours(0, 0, 0, 0);
+      const endDate = new Date(date);
+      endDate.setHours(23, 59, 59, 999);
+
+      whereCondition.appointmentDateTime = {
+        [Op.between]: [startDate, endDate],
+      };
+    }
+
     const appointments = await Appointment.findAll({
+      where: whereCondition,
       include: [
         { model: Service, attributes: ["name"] },
         {

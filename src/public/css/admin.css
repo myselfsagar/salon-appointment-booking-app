@@ -68,6 +68,21 @@
 }
 
 /* appointment styling */
+.filters-container {
+  background-color: #f8f9fa;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 2rem;
+  display: flex;
+  gap: 20px;
+}
+
+.filters-container .form-control {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
 .appointment-admin-card {
   background: #fff;
   border: 1px solid #ddd;

@@ -66,7 +66,8 @@ const getMyAppointments = asyncHandler(async (req, res, next) => {
 });
 
 const getAllAppointmentsAdmin = asyncHandler(async (req, res, next) => {
-  const appointments = await appointmentServices.getAllAppointments();
+  const { date } = req.query;
+  const appointments = await appointmentServices.getAllAppointments(date);
   sendSuccess(res, appointments, "All appointments fetched");
 });
 
