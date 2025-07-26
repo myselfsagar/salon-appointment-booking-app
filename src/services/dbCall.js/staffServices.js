@@ -1,6 +1,7 @@
 const sequelize = require("../../utils/dbConnect");
 const User = require("../../models/User");
 const StaffProfile = require("../../models/StaffProfile");
+const Service = require("../../models/Service");
 const serviceServices = require("./serviceServices");
 const emailService = require("../emailService");
 const ErrorHandler = require("../../utils/errorHandler");
@@ -51,6 +52,11 @@ const getAllStaffs = async () => {
         {
           model: User,
           attributes: ["firstName", "lastName"],
+        },
+        {
+          model: Service,
+          attributes: ["name"],
+          through: { attributes: [] },
         },
       ],
     });
