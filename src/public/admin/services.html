@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Admin - Manage Staff</title>
+    <title>Admin - Manage Services</title>
     <link rel="stylesheet" href="/css/style.css" />
     <link rel="stylesheet" href="/css/admin.css" />
   </head>
@@ -27,39 +27,44 @@
 
     <main>
       <section class="admin-page">
-        <h2>Manage Staff</h2>
-        <button id="add-staff-btn" class="btn">Add New Staff</button>
-        <div id="staff-list-container"></div>
+        <h2>Manage Services</h2>
+        <button id="add-service-btn" class="btn">Add New Service</button>
+        <div id="service-list-container"></div>
       </section>
     </main>
 
-    <div id="staff-modal" class="modal">
+    <div id="service-modal" class="modal">
       <div class="modal-content">
         <span class="close-btn">&times;</span>
-        <h2 id="modal-title">Add Staff</h2>
-        <form id="staff-form">
-          <input type="hidden" id="staff-id" name="id" />
+        <h2 id="modal-title">Add Service</h2>
+        <form id="service-form">
+          <input type="hidden" id="service-id" name="id" />
           <div class="form-group">
-            <label>First Name</label>
-            <input type="text" id="firstName" name="firstName" required />
+            <label>Service Name</label>
+            <input type="text" id="name" name="name" required />
           </div>
           <div class="form-group">
-            <label>Last Name</label>
-            <input type="text" id="lastName" name="lastName" required />
+            <label>Description</label>
+            <textarea
+              id="description"
+              name="description"
+              rows="3"
+              required
+            ></textarea>
           </div>
           <div class="form-group">
-            <label>Email</label>
-            <input type="email" id="email" name="email" required />
+            <label>Duration (in minutes)</label>
+            <input type="number" id="duration" name="duration" required />
           </div>
           <div class="form-group">
-            <label>Phone</label>
-            <input type="tel" id="phone" name="phone" required />
+            <label>Price</label>
+            <input type="number" step="0.01" id="price" name="price" required />
           </div>
           <div class="form-group">
-            <label>Specialization</label>
-            <input type="text" id="specialization" name="specialization" />
+            <label>Category</label>
+            <input type="text" id="category" name="category" required />
           </div>
-          <button type="submit" class="btn">Save Staff</button>
+          <button type="submit" class="btn">Save Service</button>
         </form>
       </div>
     </div>
@@ -70,6 +75,6 @@
 
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="/js/auth.js"></script>
-    <script src="/js/admin-staff.js"></script>
+    <script src="/js/admin-services.js"></script>
   </body>
 </html>

@@ -133,7 +133,7 @@ document.addEventListener("DOMContentLoaded", () => {
       staffModal.style.display = "none";
       fetchStaff(); // Refresh list
     } catch (error) {
-      alert("Failed to save staff member. Please check the details.");
+      alert(error.response.data.message);
     }
   });
 
