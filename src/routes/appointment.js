@@ -25,4 +25,11 @@ router.get(
   appointmentController.getAllAppointmentsAdmin
 );
 
+router.patch(
+  "/:id",
+  authMiddleware,
+  checkRole("admin", "staff"),
+  appointmentController.updateAppointmentStatusAdmin
+);
+
 module.exports = router;

@@ -219,6 +219,20 @@ const getAllAppointments = async () => {
   }
 };
 
+const updateAppointmentStatus = async (appointmentId, status) => {
+  try {
+    const appointment = await Appointment.findByPk(appointmentId);
+    if (!appointment) {
+      throw new ErrorHandler("Appointment not found", 404);
+    }
+    appointment.status = status;
+    await appointment.save();
+    return appointment;
+  } catch (error) {
+    throw error;
+  }
+};
+
 module.exports = {
   findAvailableSlots,
   findFirstAvailableStaff,
@@ -226,4 +240,5 @@ module.exports = {
   getAppointmentDetails,
   getAppointmentsByCustomerId,
   getAllAppointments,
+  updateAppointmentStatus,
 };

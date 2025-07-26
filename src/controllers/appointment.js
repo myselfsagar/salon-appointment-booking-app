@@ -70,10 +70,27 @@ const getAllAppointmentsAdmin = asyncHandler(async (req, res, next) => {
   sendSuccess(res, appointments, "All appointments fetched");
 });
 
+const updateAppointmentStatusAdmin = asyncHandler(async (req, res, next) => {
+  const { id } = req.params;
+  const { status } = req.body;
+
+  // Basic validation for the status field
+  if (!["scheduled", "completed", "cancelled"].includes(status)) {
+    throw new ErrorHandler("Invalid status provided", 400);
+  }
+
+  const updatedAppointment = await appointmentServices.updateAppointmentStatus(
+    id,
+    status
+  );
+  sendSuccess(res, updatedAppointment, "Appointment status updated");
+});
+
 module.exports = {
   getAvailableSlots,
   createAppointment,
   getAppointmentById,
   getMyAppointments,
   getAllAppointmentsAdmin,
+  updateAppointmentStatusAdmin,
 };
