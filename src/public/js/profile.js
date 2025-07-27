@@ -98,29 +98,114 @@ document.addEventListener("DOMContentLoaded", () => {
         const staffName = app.staff_profile
           ? `${app.staff_profile.user.firstName} ${app.staff_profile.user.lastName}`
           : "N/A";
-        const appointmentDate = new Date(
-          app.appointmentDateTime
-        ).toLocaleDateString("en-IN", { timeZone: "Asia/Kolkata" });
-        const appointmentTime = new Date(
-          app.appointmentDateTime
-        ).toLocaleTimeString("en-IN", {
-          timeZone: "Asia/Kolkata",
-          hour: "2-digit",
-          minute: "2-digit",
-        });
+
+        // Create a date object from the appointmentDateTime string
+        const appointmentDateTime = new Date(app.appointmentDateTime);
+
+        // Format date and time specifically for IST (Asia/Kolkata)
+        const appointmentDate = appointmentDateTime.toLocaleDateString(
+          "en-IN",
+          {
+            timeZone: "Asia/Kolkata",
+            day: "2-digit",
+            month: "long",
+            year: "numeric",
+          }
+        );
+        const appointmentTime = appointmentDateTime.toLocaleTimeString(
+          "en-IN",
+          {
+            timeZone: "Asia/Kolkata",
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: true,
+          }
+        );
+
+        const isCancellable =
+          new Date(app.appointmentDateTime) >
+          new Date(Date.now() + 24 * 60 * 60 * 1000);
 
         return `
-                <div class="appointment-card">
+                <div class="appointment-card" data-appointment-id="${
+                  app.id
+                }" data-service-id="${app.service.id}">
                     <h4>${app.service.name}</h4>
                     <p><strong>Date:</strong> ${appointmentDate}</p>
                     <p><strong>Time:</strong> ${appointmentTime}</p>
                     <p><strong>With:</strong> ${staffName}</p>
-                    <p><strong>Status:</strong> <span class="status-${app.status}">${app.status}</span></p>
+                    <p><strong>Status:</strong> <span class="status-${
+                      app.status
+                    }">${app.status}</span></p>
+                    ${
+                      app.status === "scheduled" && isCancellable
+                        ? `
+                        <div class="appointment-actions">
+                            <button class="btn reschedule-btn">Reschedule</button>
+                            <button class="btn cancel-btn">Cancel</button>
+                        </div>
+                        `
+                        : ""
+                    }
                 </div>
             `;
       })
       .join("");
   }
+
+  appointmentsContainer.addEventListener("click", async (e) => {
+    const target = e.target;
+    const card = target.closest(".appointment-card");
+    if (!card) return;
+
+    const appointmentId = card.dataset.appointmentId;
+    const serviceId = card.dataset.serviceId;
+
+    if (target.classList.contains("cancel-btn")) {
+      if (confirm("Are you sure you want to cancel this appointment?")) {
+        try {
+          await axios.patch(
+            `/appointments/${appointmentId}/cancel`,
+            {},
+            {
+              headers: { Authorization: `Bearer ${token}` },
+            }
+          );
+          alert("Appointment cancelled successfully.");
+          fetchAppointments(); // Refresh the list
+        } catch (error) {
+          alert(
+            error.response?.data?.message || "Failed to cancel appointment."
+          );
+        }
+      }
+    }
+
+    if (target.classList.contains("reschedule-btn")) {
+      if (
+        confirm(
+          "This will cancel your current appointment and let you pick a new time. Are you sure?"
+        )
+      ) {
+        try {
+          await axios.patch(
+            `/appointments/${appointmentId}/cancel`,
+            {},
+            {
+              headers: { Authorization: `Bearer ${token}` },
+            }
+          );
+          // Redirect to booking page to choose a new slot
+          window.location.href = `/booking.html?serviceId=${serviceId}`;
+        } catch (error) {
+          alert(
+            error.response?.data?.message ||
+              "Failed to start rescheduling process."
+          );
+        }
+      }
+    }
+  });
 
   fetchProfile();
   fetchAppointments();

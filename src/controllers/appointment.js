@@ -87,6 +87,14 @@ const updateAppointmentStatusAdmin = asyncHandler(async (req, res, next) => {
   sendSuccess(res, updatedAppointment, "Appointment status updated");
 });
 
+const cancelMyAppointment = asyncHandler(async (req, res, next) => {
+  const { id } = req.params;
+  const customerId = req.user.id;
+
+  await appointmentServices.cancelAppointmentByUser(id, customerId);
+  sendSuccess(res, {}, "Appointment cancelled successfully");
+});
+
 module.exports = {
   getAvailableSlots,
   createAppointment,
@@ -94,4 +102,5 @@ module.exports = {
   getMyAppointments,
   getAllAppointmentsAdmin,
   updateAppointmentStatusAdmin,
+  cancelMyAppointment,
 };

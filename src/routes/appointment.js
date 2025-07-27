@@ -32,4 +32,10 @@ router.patch(
   appointmentController.updateAppointmentStatusAdmin
 );
 
+router.patch(
+  "/:id/cancel",
+  authMiddleware,
+  appointmentController.cancelMyAppointment
+);
+
 module.exports = router;

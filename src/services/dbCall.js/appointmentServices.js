@@ -186,7 +186,7 @@ const getAppointmentsByCustomerId = async (customerId) => {
     const appointments = await Appointment.findAll({
       where: { customerId: customerId },
       include: [
-        { model: Service, attributes: ["name", "duration", "price"] },
+        { model: Service, attributes: ["id", "name", "duration", "price"] },
         {
           model: StaffProfile,
           include: [{ model: User, attributes: ["firstName", "lastName"] }],
@@ -236,16 +236,36 @@ const getAllAppointments = async (date) => {
 
 const updateAppointmentStatus = async (appointmentId, status) => {
   try {
-    const appointment = await Appointment.findByPk(appointmentId);
-    if (!appointment) {
-      throw new ErrorHandler("Appointment not found", 404);
-    }
+    const appointment = await getAppointmentDetails(appointmentId);
     appointment.status = status;
     await appointment.save();
     return appointment;
   } catch (error) {
     throw error;
   }
+};
+
+const cancelAppointmentByUser = async (appointmentId, customerId) => {
+  const appointment = await getAppointmentDetails(appointmentId);
+
+  if (appointment.customerId !== customerId) {
+    throw new ErrorHandler(
+      "You are not authorized to cancel this appointment",
+      403
+    );
+  }
+
+  const appointmentTime = new Date(appointment.appointmentDateTime);
+  const now = new Date();
+  const hoursDifference = (appointmentTime - now) / (1000 * 60 * 60);
+
+  if (hoursDifference < 24) {
+    throw new ErrorHandler("Cannot cancel appointment within 24 hours.", 400);
+  }
+
+  appointment.status = "cancelled";
+  await appointment.save();
+  return appointment;
 };
 
 const getAppointmentsForReminders = async (startTime, endTime) => {
@@ -273,5 +293,6 @@ module.exports = {
   getAppointmentsByCustomerId,
   getAllAppointments,
   updateAppointmentStatus,
+  cancelAppointmentByUser,
   getAppointmentsForReminders,
 };

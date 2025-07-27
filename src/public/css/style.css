@@ -80,6 +80,10 @@ nav a {
   font-weight: bold;
 }
 
+.btn:hover {
+  background-color: #f39d2d;
+}
+
 /* Modal Styles */
 .modal {
   display: none;
