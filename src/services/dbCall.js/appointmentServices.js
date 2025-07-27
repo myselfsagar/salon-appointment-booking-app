@@ -248,6 +248,23 @@ const updateAppointmentStatus = async (appointmentId, status) => {
   }
 };
 
+const getAppointmentsForReminders = async (startTime, endTime) => {
+  return await Appointment.findAll({
+    where: {
+      appointmentDateTime: { [Op.between]: [startTime, endTime] },
+      status: "scheduled",
+      reminderSent: false,
+    },
+    include: [
+      { model: Service, attributes: ["name"] },
+      {
+        model: StaffProfile,
+        include: [{ model: User, attributes: ["firstName", "lastName"] }],
+      },
+    ],
+  });
+};
+
 module.exports = {
   findAvailableSlots,
   findFirstAvailableStaff,
@@ -256,4 +273,5 @@ module.exports = {
   getAppointmentsByCustomerId,
   getAllAppointments,
   updateAppointmentStatus,
+  getAppointmentsForReminders,
 };

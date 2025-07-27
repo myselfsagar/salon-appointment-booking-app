@@ -16,6 +16,11 @@ const Appointment = sequelize.define("appointments", {
     defaultValue: "scheduled",
     allowNull: false,
   },
+  reminderSent: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false,
+    allowNull: false,
+  },
 });
 
 module.exports = Appointment;

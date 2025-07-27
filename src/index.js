@@ -18,6 +18,7 @@ app.use(express.static("src/public"));
 //routes
 app.use(routes);
 app.use(errorMiddleware);
+require("./utils/jobs/appointmentReminders");
 
 (async () => {
   try {

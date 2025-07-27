@@ -80,7 +80,44 @@ const sendBookingConfirmationEmail = async (user, appointmentDetails) => {
   });
 };
 
+const sendAppointmentReminderEmail = async (user, appointmentDetails) => {
+  const sender = { email: "ssahu6244@gmail.com", name: "From Admin SAGAR" };
+  const receivers = [{ email: user.email }];
+
+  const serviceName = appointmentDetails.service.name;
+  const staffName = `${appointmentDetails.staff_profile.user.firstName} ${appointmentDetails.staff_profile.user.lastName}`;
+  const formattedDate = new Date(
+    appointmentDetails.appointmentDateTime
+  ).toLocaleString();
+
+  await tranEmailApi.sendTransacEmail({
+    sender,
+    to: receivers,
+    subject: "Reminder: Your Appointment is Tomorrow!",
+    htmlContent: `
+      <!DOCTYPE html>
+      <html>
+      <head>
+          <title>Appointment Reminder</title>
+      </head>
+      <body>
+          <h1>Just a Friendly Reminder!</h1>
+          <p>Hi ${user.firstName},</p>
+          <p>This is a reminder for your upcoming appointment:</p>
+          <ul>
+              <li><strong>Service:</strong> ${serviceName}</li>
+              <li><strong>With:</strong> ${staffName}</li>
+              <li><strong>Date & Time:</strong> ${formattedDate}</li>
+          </ul>
+          <p>We look forward to seeing you!</p>
+      </body>
+      </html>
+    `,
+  });
+};
+
 module.exports = {
   sendPasswordResetEmail,
   sendBookingConfirmationEmail,
+  sendAppointmentReminderEmail,
 };
