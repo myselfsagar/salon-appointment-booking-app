@@ -264,6 +264,12 @@ nav a {
   text-align: center;
 }
 
+.booking-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
 #service-details-container {
   background-color: #f9f9f9;
   padding: 1rem;
@@ -332,6 +338,44 @@ nav a {
   font-weight: bold;
 }
 
+/* payment styling */
+.confirmation-panel {
+  background-color: #f9f9f9;
+  padding: 1.5rem;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+}
+
+.confirmation-panel.hidden {
+  display: none;
+}
+
+.confirmation-panel h3 {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  color: #333;
+}
+
+.confirmation-details p {
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+}
+
+.confirmation-details strong {
+  color: #555;
+}
+
+#proceed-to-payment-btn {
+  width: 100%;
+  padding: 12px;
+  font-size: 1.1rem;
+  background-color: #28a745;
+  color: white;
+}
+#proceed-to-payment-btn:hover {
+  background-color: #218838;
+}
+
 /* Footer Styles */
 footer {
   text-align: center;
@@ -339,4 +383,16 @@ footer {
   background: #333;
   color: #fff;
   margin-top: 2rem;
+}
+
+@media (min-width: 768px) {
+  .booking-layout {
+    flex-direction: row;
+  }
+  .selection-container {
+    flex: 2;
+  }
+  .confirmation-panel {
+    flex: 1;
+  }
 }

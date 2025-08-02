@@ -120,23 +120,23 @@ const findFirstAvailableStaff = async (serviceId, appointmentDateTime) => {
 };
 
 const bookAppointment = async (bookingData) => {
-  const { customerId, serviceId, appointmentDateTime } = bookingData;
-  const availableStaff = await findFirstAvailableStaff(
-    serviceId,
-    appointmentDateTime
-  );
-  if (!availableStaff) {
-    throw new ErrorHandler(
-      "The selected time slot is no longer available. Please try another.",
-      409
-    );
-  }
-  const appointment = await Appointment.create({
+  const {
     customerId,
-    staffId: availableStaff.id,
+    staffId,
     serviceId,
     appointmentDateTime,
+    razorpayOrderId,
+  } = bookingData;
+
+  const appointment = await Appointment.create({
+    customerId,
+    staffId,
+    serviceId,
+    appointmentDateTime,
+    razorpayOrderId,
+    status: "pending",
   });
+
   return appointment;
 };
 

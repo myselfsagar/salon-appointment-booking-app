@@ -41,13 +41,35 @@
       <section class="booking-page">
         <h2>Book Your Appointment</h2>
         <div id="service-details-container"></div>
-        <div class="booking-form">
-          <div class="form-group">
-            <label for="appointment-date">Select a Date:</label>
-            <input type="date" id="appointment-date" class="form-control" />
+
+        <div class="booking-layout">
+          <div class="selection-container">
+            <div class="booking-form">
+              <div class="form-group">
+                <label for="appointment-date">Select a Date:</label>
+                <input type="date" id="appointment-date" class="form-control" />
+              </div>
+              <div id="slots-container"></div>
+            </div>
           </div>
-          <div id="slots-container"></div>
+
+          <div id="confirmation-panel" class="confirmation-panel hidden">
+            <h3>Confirm Your Appointment</h3>
+            <div class="confirmation-details">
+              <p>
+                <strong>Service:</strong>
+                <span id="confirm-service-name"></span>
+              </p>
+              <p><strong>Date:</strong> <span id="confirm-date"></span></p>
+              <p><strong>Time:</strong> <span id="confirm-time"></span></p>
+              <p><strong>Price:</strong> <span id="confirm-price"></span></p>
+            </div>
+            <button id="proceed-to-payment-btn" class="btn">
+              Proceed to Payment
+            </button>
+          </div>
         </div>
+
         <div id="booking-message" class="form-message"></div>
       </section>
     </main>
@@ -56,6 +78,7 @@
       <p>&copy; 2025 Sagar's Salon & Spa. All Rights Reserved.</p>
     </footer>
 
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="/js/auth.js"></script>
     <script src="/js/booking.js"></script>

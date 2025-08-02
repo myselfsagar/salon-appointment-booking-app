@@ -12,7 +12,7 @@ const Appointment = sequelize.define("appointments", {
     allowNull: false,
   },
   status: {
-    type: DataTypes.ENUM("scheduled", "completed", "cancelled"),
+    type: DataTypes.ENUM("pending", "scheduled", "completed", "cancelled"),
     defaultValue: "scheduled",
     allowNull: false,
   },
@@ -20,6 +20,10 @@ const Appointment = sequelize.define("appointments", {
     type: DataTypes.BOOLEAN,
     defaultValue: false,
     allowNull: false,
+  },
+  razorpayOrderId: {
+    type: DataTypes.STRING,
+    allowNull: true,
   },
 });
 
