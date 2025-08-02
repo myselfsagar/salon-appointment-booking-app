@@ -3,8 +3,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   const token = localStorage.getItem("accessToken");
 
   if (!token) {
-    // If the user is not logged in, you can redirect them or show a message
-    // For now, we'll try to fetch services anyway, as the endpoint allows it.
     console.log("User is not logged in. Viewing services as a guest.");
   }
 
@@ -30,24 +28,42 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 });
 
-function renderServices(services) {
+async function renderServices(services) {
   const servicesContainer = document.getElementById("services-container");
-  servicesContainer.innerHTML = ""; // Clear previous content
+  servicesContainer.innerHTML = "";
 
-  services.forEach((service) => {
+  for (const service of services) {
+    let avgRating = "No reviews yet";
+    try {
+      const reviewResponse = await axios.get(`/reviews/service/${service.id}`);
+      const reviews = reviewResponse.data.data;
+      if (reviews.length > 0) {
+        const totalRating = reviews.reduce(
+          (acc, review) => acc + review.rating,
+          0
+        );
+        avgRating = `${(totalRating / reviews.length).toFixed(1)} ★ (${
+          reviews.length
+        } reviews)`;
+      }
+    } catch (error) {
+      console.error(`Could not fetch reviews for service ${service.id}`);
+    }
+
     const serviceCard = document.createElement("div");
     serviceCard.className = "service-card";
     serviceCard.innerHTML = `
-            <h3>${service.name}</h3>
-            <p>${service.description}</p>
-            <div class="service-details">
-                <span>Duration: ${service.duration} mins</span>
-                <span>Price: $${service.price}</span>
-            </div>
-            <button class="btn book-service-btn" data-service-id="${service.id}">Book Now</button>
-        `;
+      <h3>${service.name}</h3>
+      <p class="service-rating"><strong>Rating:</strong> ${avgRating}</p>
+      <p>${service.description}</p>
+      <div class="service-details">
+          <span>Duration: ${service.duration} mins</span>
+          <span>Price: ₹${service.price}</span>
+      </div>
+      <button class="btn book-service-btn" data-service-id="${service.id}">Book Now</button>
+    `;
     servicesContainer.appendChild(serviceCard);
-  });
+  }
 }
 
 document
@@ -59,8 +75,7 @@ document
 
       if (!token) {
         alert("Please log in to book an appointment.");
-        // You can also programmatically open the login modal here if you want
-        openModal("login"); // This would require openModal to be globally accessible
+        openModal("login");
         return;
       }
 

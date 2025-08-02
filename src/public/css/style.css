@@ -338,6 +338,43 @@ nav a {
   font-weight: bold;
 }
 
+.appointment-actions {
+  margin-top: 1rem;
+  text-align: right;
+}
+
+.review-btn {
+  background-color: #17a2b8; /* Teal */
+  color: white;
+}
+.review-btn:hover {
+  background-color: #138496;
+}
+
+/* Star Rating in Modal */
+.star-rating {
+  direction: ltr; /* Left to right */
+  display: inline-block;
+  padding: 0;
+}
+.star-rating .star {
+  font-size: 2.5rem;
+  color: #e4e5e9;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+.star-rating .star:hover,
+.star-rating .star:hover ~ .star {
+  color: #ffc107;
+}
+
+/* Rating on Service Card */
+.service-rating {
+  font-weight: bold;
+  color: #555;
+  margin-bottom: 0.5rem;
+}
+
 /* payment styling */
 .confirmation-panel {
   background-color: #f9f9f9;

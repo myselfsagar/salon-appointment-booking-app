@@ -3,6 +3,7 @@ const ForgotPassword = require("./ForgotPassword");
 const Service = require("./Service");
 const StaffProfile = require("./StaffProfile");
 const Appointment = require("./Appointment");
+const Review = require("./Review");
 
 //User, forgot password - one to many
 User.hasMany(ForgotPassword);
@@ -36,3 +37,13 @@ StaffProfile.hasMany(Appointment, {
   foreignKey: "staffId",
 });
 Service.hasMany(Appointment, { foreignKey: "serviceId" });
+
+// Review Associations
+Review.belongsTo(User, { foreignKey: "customerId" });
+User.hasMany(Review, { foreignKey: "customerId" });
+
+Review.belongsTo(Service, { foreignKey: "serviceId" });
+Service.hasMany(Review, { foreignKey: "serviceId" });
+
+Review.belongsTo(Appointment, { foreignKey: "appointmentId" });
+Appointment.hasOne(Review, { foreignKey: "appointmentId" });

@@ -5,10 +5,14 @@ document.addEventListener("DOMContentLoaded", () => {
     return;
   }
 
+  // --- DOM Elements ---
   const profileContainer = document.getElementById("profile-container");
   const appointmentsContainer = document.getElementById(
     "appointments-container"
   );
+  const reviewModal = document.getElementById("review-modal");
+  const reviewForm = document.getElementById("review-form");
+  const stars = document.querySelectorAll(".star-rating .star");
 
   async function fetchProfile() {
     try {
@@ -126,29 +130,31 @@ document.addEventListener("DOMContentLoaded", () => {
           new Date(app.appointmentDateTime) >
           new Date(Date.now() + 24 * 60 * 60 * 1000);
 
+        let actionButtons = "";
+        if (app.status === "scheduled" && isCancellable) {
+          actionButtons = `<div class="appointment-actions">
+              <button class="btn reschedule-btn">Reschedule</button>
+              <button class="btn cancel-btn">Cancel</button>
+            </div>`;
+        } else if (app.status === "completed" && !app.review) {
+          // Show if completed and not reviewed
+          actionButtons = `<div class="appointment-actions">
+              <button class="btn review-btn">Leave a Review</button>
+            </div>`;
+        } else if (app.review) {
+          actionButtons = `<div class="appointment-actions"><p>Reviewed: ${app.review.rating} ★</p></div>`;
+        }
+
         return `
-                <div class="appointment-card" data-appointment-id="${
-                  app.id
-                }" data-service-id="${app.service.id}">
-                    <h4>${app.service.name}</h4>
-                    <p><strong>Date:</strong> ${appointmentDate}</p>
-                    <p><strong>Time:</strong> ${appointmentTime}</p>
-                    <p><strong>With:</strong> ${staffName}</p>
-                    <p><strong>Status:</strong> <span class="status-${
-                      app.status
-                    }">${app.status}</span></p>
-                    ${
-                      app.status === "scheduled" && isCancellable
-                        ? `
-                        <div class="appointment-actions">
-                            <button class="btn reschedule-btn">Reschedule</button>
-                            <button class="btn cancel-btn">Cancel</button>
-                        </div>
-                        `
-                        : ""
-                    }
-                </div>
-            `;
+          <div class="appointment-card" data-appointment-id="${app.id}" data-service-id="${app.service.id}">
+            <h4>${app.service.name}</h4>
+            <p><strong>Date:</strong> ${appointmentDate}</p>
+            <p><strong>Time:</strong> ${appointmentTime}</p>
+            <p><strong>With:</strong> ${staffName}</p>
+            <p><strong>Status:</strong> <span class="status-${app.status}">${app.status}</span></p>
+            ${actionButtons}
+          </div>
+        `;
       })
       .join("");
   }
@@ -204,6 +210,60 @@ document.addEventListener("DOMContentLoaded", () => {
           );
         }
       }
+    }
+
+    if (target.classList.contains("review-btn")) {
+      const card = e.target.closest(".appointment-card");
+      const appointmentId = card.dataset.appointmentId;
+      document.getElementById("review-appointment-id").value = appointmentId;
+      reviewModal.style.display = "block";
+    }
+  });
+
+  // --- Review Modal Logic ---
+  reviewModal.querySelector(".close-btn").addEventListener("click", () => {
+    reviewModal.style.display = "none";
+    reviewForm.reset();
+  });
+
+  stars.forEach((star) => {
+    star.addEventListener("click", () => {
+      const rating = star.dataset.value;
+      document.getElementById("rating-value").value = rating;
+      stars.forEach((s) => {
+        s.style.color = s.dataset.value <= rating ? "#ffc107" : "#e4e5e9";
+      });
+    });
+  });
+
+  reviewForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const reviewMessage = document.getElementById("review-message");
+    try {
+      const response = await axios.post(
+        "/reviews",
+        {
+          appointmentId: document.getElementById("review-appointment-id").value,
+          rating: document.getElementById("rating-value").value,
+          comment: document.getElementById("review-comment").value,
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      reviewMessage.textContent = "Review submitted successfully!";
+      reviewMessage.className = "form-message success";
+      reviewMessage.style.display = "block";
+
+      setTimeout(() => {
+        reviewModal.style.display = "none";
+        reviewForm.reset();
+        fetchAppointments(); // Refresh to hide the review button
+      }, 2000);
+    } catch (error) {
+      reviewMessage.textContent =
+        error.response?.data?.message || "Failed to submit review.";
+      reviewMessage.className = "form-message error";
+      reviewMessage.style.display = "block";
     }
   });
 
