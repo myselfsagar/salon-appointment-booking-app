@@ -35,20 +35,30 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     serviceListContainer.innerHTML = services
-      .map(
-        (service) => `
+      .map((service) => {
+        const rating = parseFloat(service.averageRating);
+        const reviewCount = parseInt(service.reviewCount);
+        let ratingDisplay = "No reviews yet";
+        if (reviewCount > 0) {
+          ratingDisplay = `<strong>Rating:</strong> ${
+            !isNaN(rating) ? rating.toFixed(1) : "N/A"
+          } ★ (${reviewCount} reviews)`;
+        }
+
+        return `
             <div class="service-admin-card" data-id="${service.id}">
                 <div>
                     <strong>${service.name}</strong> (${service.category})<br>
                     <small>Duration: ${service.duration} mins | Price: $${service.price}</small>
+                    <div class="service-rating-admin">${ratingDisplay}</div>
                 </div>
                 <div class="service-actions">
                     <button class="btn edit-btn">Edit</button>
                     <button class="btn delete-btn" style="background-color: #dc3545;">Delete</button>
                 </div>
             </div>
-        `
-      )
+            `;
+      })
       .join("");
   }
 

@@ -375,6 +375,15 @@ nav a {
   margin-bottom: 0.5rem;
 }
 
+.staff-response {
+  background-color: #f8f9fa;
+  border-left: 4px solid #f7c08a;
+  padding: 10px;
+  margin-top: 10px;
+  font-size: 0.9em;
+  border-radius: 4px;
+}
+
 /* payment styling */
 .confirmation-panel {
   background-color: #f9f9f9;

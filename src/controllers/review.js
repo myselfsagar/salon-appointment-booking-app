@@ -4,6 +4,7 @@ const { sendSuccess } = require("../utils/responseHandler");
 const Appointment = require("../models/Appointment");
 const Review = require("../models/Review");
 const User = require("../models/User");
+const Service = require("../models/Service");
 
 // @desc    Create a new review
 // @route   POST /reviews
@@ -67,4 +68,44 @@ const getServiceReviews = asyncHandler(async (req, res, next) => {
   sendSuccess(res, reviews, "Reviews fetched successfully.");
 });
 
-module.exports = { createReview, getServiceReviews };
+// @desc    Get all reviews (for admin)
+// @route   GET /reviews
+const getAllReviews = asyncHandler(async (req, res, next) => {
+  const reviews = await Review.findAll({
+    include: [
+      { model: User, attributes: ["firstName", "lastName"] },
+      { model: Service, attributes: ["name"] },
+    ],
+    order: [["createdAt", "DESC"]],
+  });
+  sendSuccess(res, reviews, "All reviews fetched successfully.");
+});
+
+// @desc    Add a staff response to a review
+// @route   PATCH /reviews/:reviewId/respond
+const addStaffResponse = asyncHandler(async (req, res, next) => {
+  const { reviewId } = req.params;
+  const { response } = req.body;
+
+  if (!response) {
+    return next(new ErrorHandler("Response text is required.", 400));
+  }
+
+  const review = await Review.findByPk(reviewId);
+
+  if (!review) {
+    return next(new ErrorHandler("Review not found.", 404));
+  }
+
+  review.staffResponse = response;
+  await review.save();
+
+  sendSuccess(res, review, "Response added successfully.");
+});
+
+module.exports = {
+  createReview,
+  getServiceReviews,
+  getAllReviews,
+  addStaffResponse,
+};

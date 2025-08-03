@@ -19,6 +19,10 @@ const Review = sequelize.define("reviews", {
     type: DataTypes.TEXT,
     allowNull: true,
   },
+  staffResponse: {
+    type: DataTypes.TEXT,
+    allowNull: true,
+  },
 });
 
 module.exports = Review;

@@ -1,4 +1,6 @@
 const Service = require("../../models/Service");
+const Review = require("../../models/Review");
+const { Sequelize } = require("sequelize");
 const ErrorHandler = require("../../utils/errorHandler");
 
 const createService = async (data) => {
@@ -14,7 +16,32 @@ const getAllServices = async ({ category }) => {
     let whereCondition = {};
     if (category) whereCondition.category = category;
 
-    return await Service.findAll({ where: whereCondition });
+    return await Service.findAll({
+      where: whereCondition,
+      include: [
+        {
+          model: Review,
+          attributes: [],
+          required: false,
+        },
+      ],
+      attributes: {
+        include: [
+          // Calculate the average rating and cast it to a decimal
+          [
+            Sequelize.fn(
+              "ROUND",
+              Sequelize.fn("AVG", Sequelize.col("reviews.rating")),
+              1
+            ),
+            "averageRating",
+          ],
+          // Count the number of reviews
+          [Sequelize.fn("COUNT", Sequelize.col("reviews.id")), "reviewCount"],
+        ],
+      },
+      group: ["services.id"], // Group by service to get per-service aggregates
+    });
   } catch (error) {
     throw error;
   }

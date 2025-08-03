@@ -131,6 +131,12 @@ body.sidebar-open main {
   color: #555;
 }
 
+.service-rating-admin {
+  margin-top: 8px;
+  font-size: 0.9em;
+  color: #555;
+}
+
 /* appointment styling */
 .filters-container {
   background-color: #f8f9fa;
@@ -165,4 +171,44 @@ body.sidebar-open main {
 .status-updater select {
   padding: 5px;
   border-radius: 5px;
+}
+
+/* Styles for Admin Reviews Page */
+.review-admin-card {
+  background: #fff;
+  border: 1px solid #ddd;
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.review-admin-card .review-content {
+  flex-grow: 1;
+}
+
+.review-admin-card .rating {
+  color: #ffc107;
+}
+
+.review-admin-card .comment {
+  margin: 5px 0;
+  color: #555;
+}
+
+.review-admin-card .staff-response {
+  background-color: #e9f5e9;
+  border-left: 3px solid #28a745;
+  padding: 8px;
+  margin-top: 8px;
+  font-size: 0.9em;
+}
+
+.review-admin-card .no-response {
+  color: #dc3545;
+  font-style: italic;
+  font-size: 0.9em;
+  margin-top: 8px;
 }

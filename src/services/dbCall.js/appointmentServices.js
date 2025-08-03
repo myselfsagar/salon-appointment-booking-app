@@ -3,6 +3,7 @@ const Appointment = require("../../models/Appointment");
 const Service = require("../../models/Service");
 const StaffProfile = require("../../models/StaffProfile");
 const User = require("../../models/User");
+const Review = require("../../models/Review");
 const ErrorHandler = require("../../utils/errorHandler");
 const {
   toDate,
@@ -217,8 +218,9 @@ const getAppointmentsByCustomerId = async (customerId) => {
           model: StaffProfile,
           include: [{ model: User, attributes: ["firstName", "lastName"] }],
         },
+        { model: Review },
       ],
-      order: [["appointmentDateTime", "DESC"]], // Show most recent first
+      order: [["appointmentDateTime", "DESC"]],
     });
     return appointments;
   } catch (error) {

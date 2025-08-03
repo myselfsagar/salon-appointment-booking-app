@@ -103,10 +103,8 @@ document.addEventListener("DOMContentLoaded", () => {
           ? `${app.staff_profile.user.firstName} ${app.staff_profile.user.lastName}`
           : "N/A";
 
-        // Create a date object from the appointmentDateTime string
         const appointmentDateTime = new Date(app.appointmentDateTime);
 
-        // Format date and time specifically for IST (Asia/Kolkata)
         const appointmentDate = appointmentDateTime.toLocaleDateString(
           "en-IN",
           {
@@ -137,12 +135,21 @@ document.addEventListener("DOMContentLoaded", () => {
               <button class="btn cancel-btn">Cancel</button>
             </div>`;
         } else if (app.status === "completed" && !app.review) {
-          // Show if completed and not reviewed
           actionButtons = `<div class="appointment-actions">
               <button class="btn review-btn">Leave a Review</button>
             </div>`;
         } else if (app.review) {
-          actionButtons = `<div class="appointment-actions"><p>Reviewed: ${app.review.rating} ★</p></div>`;
+          let staffResponseHtml = "";
+          if (app.review.staffResponse) {
+            staffResponseHtml = `<div class="staff-response"><strong>Staff Response:</strong> ${app.review.staffResponse}</div>`;
+          }
+          actionButtons = `<div class="appointment-actions">
+                              <p><strong>Your Review:</strong> ${"★".repeat(
+                                app.review.rating
+                              )}${"☆".repeat(5 - app.review.rating)}</p>
+                              <p><em>"${app.review.comment}"</em></p>
+                              ${staffResponseHtml}
+                           </div>`;
         }
 
         return `
