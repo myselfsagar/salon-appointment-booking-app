@@ -31,7 +31,7 @@ document.addEventListener("DOMContentLoaded", () => {
     loginBtn: document.getElementById("login-btn"),
     signupBtn: document.getElementById("signup-btn"),
     logoutBtn: document.getElementById("logout-btn"),
-    closeBtn: document.querySelector(".close-btn"),
+    authModalCloseBtn: document.querySelector("#auth-modal .close-btn"), // More specific selector for the auth modal
     authModal: document.getElementById("auth-modal"),
   };
 
@@ -51,7 +51,12 @@ document.addEventListener("DOMContentLoaded", () => {
         ) {
           el.style.display = "none";
         } else {
-          el.style.display = "list-item";
+          // Check if it's in the sidebar or a regular nav link
+          if (el.parentElement.id === "admin-sidebar") {
+            el.style.display = "block";
+          } else {
+            el.style.display = "list-item";
+          }
         }
       });
       loggedOutElements.forEach((el) => (el.style.display = "none"));
@@ -61,16 +66,30 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // --- Event Listeners ---
+  // --- Auth Event Listeners ---
   elements.loginBtn?.addEventListener("click", () => openModal("login"));
   elements.signupBtn?.addEventListener("click", () => openModal("signup"));
-  elements.logoutBtn?.addEventListener("click", () => {
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("userRole");
-    window.location.href = "/";
-  });
 
-  elements.closeBtn?.addEventListener("click", closeModal);
+  // Use the logout button from the sidebar
+  const sidebarLogoutBtn = document.querySelector("#admin-sidebar #logout-btn");
+  if (sidebarLogoutBtn) {
+    sidebarLogoutBtn.addEventListener("click", () => {
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("userRole");
+      window.location.href = "/";
+    });
+  }
+
+  // Use the logout button from the main nav (for non-admin pages)
+  if (elements.logoutBtn) {
+    elements.logoutBtn.addEventListener("click", () => {
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("userRole");
+      window.location.href = "/";
+    });
+  }
+
+  elements.authModalCloseBtn?.addEventListener("click", closeModal);
   window.addEventListener("click", (e) => {
     if (e.target == elements.authModal) closeModal();
   });
@@ -81,4 +100,30 @@ document.addEventListener("DOMContentLoaded", () => {
   } else {
     updateNavUI(false);
   }
+
+  // --- Admin Sidebar Logic ---
+  const menuBtn = document.querySelector(".menu-btn");
+  const sidebarCloseBtn = document.querySelector(".sidebar .close-btn");
+  const sidebar = document.getElementById("admin-sidebar");
+
+  if (menuBtn && sidebar) {
+    menuBtn.addEventListener("click", (e) => {
+      e.stopPropagation(); // Prevent the window click listener from closing it immediately
+      document.body.classList.add("sidebar-open");
+    });
+  }
+
+  if (sidebarCloseBtn && sidebar) {
+    sidebarCloseBtn.addEventListener("click", () => {
+      document.body.classList.remove("sidebar-open");
+    });
+  }
+
+  window.addEventListener("click", (event) => {
+    if (document.body.classList.contains("sidebar-open")) {
+      if (!sidebar.contains(event.target) && !menuBtn.contains(event.target)) {
+        document.body.classList.remove("sidebar-open");
+      }
+    }
+  });
 });
