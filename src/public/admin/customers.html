@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Admin - Manage Appointments</title>
+    <title>Admin - Manage Customers</title>
     <link rel="stylesheet" href="/css/style.css" />
     <link rel="stylesheet" href="/css/admin.css" />
   </head>
@@ -29,17 +29,37 @@
 
     <main>
       <section class="admin-page">
-        <h2>Manage Appointments</h2>
-
-        <div class="filters-container">
-          <div class="form-group">
-            <label for="date-filter">Filter by Date:</label>
-            <input type="date" id="date-filter" class="form-control" />
-          </div>
-        </div>
-        <div id="appointment-list-container"></div>
+        <h2>Manage Customers</h2>
+        <div id="customer-list-container"></div>
       </section>
     </main>
+
+    <div id="customer-modal" class="modal">
+      <div class="modal-content">
+        <span class="close-btn">&times;</span>
+        <h2 id="modal-title">Edit Customer</h2>
+        <form id="customer-form">
+          <input type="hidden" id="customer-id" />
+          <div class="form-group">
+            <label>First Name</label>
+            <input type="text" id="firstName" name="firstName" required />
+          </div>
+          <div class="form-group">
+            <label>Last Name</label>
+            <input type="text" id="lastName" name="lastName" required />
+          </div>
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" id="email" name="email" disabled />
+          </div>
+          <div class="form-group">
+            <label>Phone</label>
+            <input type="tel" id="phone" name="phone" required />
+          </div>
+          <button type="submit" class="btn">Save Changes</button>
+        </form>
+      </div>
+    </div>
 
     <footer>
       <p>&copy; 2025 Sagar's Salon & Spa. All Rights Reserved.</p>
@@ -47,6 +67,6 @@
 
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="/js/auth.js"></script>
-    <script src="/js/admin-appointments.js"></script>
+    <script src="/js/admin-customers.js"></script>
   </body>
 </html>

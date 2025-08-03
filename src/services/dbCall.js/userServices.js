@@ -66,10 +66,49 @@ const updateMyProfile = async (data) => {
   }
 };
 
+const getAllUsers = async () => {
+  try {
+    const users = await User.findAll({
+      where: { role: "customer" },
+      attributes: { exclude: ["password"] },
+    });
+    return users;
+  } catch (error) {
+    throw error;
+  }
+};
+
+const updateUserById = async (userId, data) => {
+  try {
+    const user = await User.findByPk(userId);
+    if (!user) {
+      throw new ErrorHandler("User not found", 404);
+    }
+
+    const updateFields = {};
+    if (data.firstName) updateFields.firstName = data.firstName;
+    if (data.lastName) updateFields.lastName = data.lastName;
+    if (data.phone) updateFields.phone = data.phone;
+    if (data.role) updateFields.role = data.role;
+
+    await user.update(updateFields);
+
+    const updatedUser = await User.findByPk(userId, {
+      attributes: { exclude: ["password"] },
+    });
+
+    return updatedUser;
+  } catch (error) {
+    throw error;
+  }
+};
+
 module.exports = {
   createUser,
   getUserForAuth,
   getUserByEmail,
   getUserById,
   updateMyProfile,
+  getAllUsers,
+  updateUserById,
 };

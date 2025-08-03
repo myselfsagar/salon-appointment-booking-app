@@ -16,7 +16,28 @@ const updateMyProfile = asyncHandler(async (req, res, next) => {
   return sendSuccess(res, user, "profile updated successfully");
 });
 
+const getUserById = asyncHandler(async (req, res, next) => {
+  const { id } = req.params;
+  const user = await userServices.getUserById(id);
+  sendSuccess(res, user, "User details fetched successfully.");
+});
+
+const getAllUsers = asyncHandler(async (req, res, next) => {
+  const users = await userServices.getAllUsers();
+  sendSuccess(res, users, "All users fetched successfully.");
+});
+
+const updateUserById = asyncHandler(async (req, res, next) => {
+  const { id } = req.params;
+  const userData = req.body;
+  const updatedUser = await userServices.updateUserById(id, userData);
+  sendSuccess(res, updatedUser, "User updated successfully.");
+});
+
 module.exports = {
   getMyProfile,
   updateMyProfile,
+  getUserById,
+  getAllUsers,
+  updateUserById,
 };
