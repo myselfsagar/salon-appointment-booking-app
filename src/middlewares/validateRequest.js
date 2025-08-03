@@ -2,10 +2,20 @@ const { sendError } = require("../utils/responseHandler");
 
 const validateRequest = (schema) => {
   return (req, res, next) => {
-    const { error } = schema.validate(req.body, { abortEarly: true });
+    const { error } = schema.validate(req.body, {
+      abortEarly: false,
+      errors: {
+        wrap: {
+          label: "",
+        },
+      },
+    });
 
     if (error) {
-      return sendError(res, error.details[0].message, 400);
+      const errorMessages = error.details
+        .map((detail) => detail.message)
+        .join(", ");
+      return sendError(res, errorMessages, 400);
     }
 
     next();
