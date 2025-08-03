@@ -40,6 +40,7 @@
         <h2 id="modal-title">Add Staff</h2>
         <form id="staff-form">
           <input type="hidden" id="staff-id" name="id" />
+
           <div class="form-group">
             <label>First Name</label>
             <input type="text" id="firstName" name="firstName" required />
@@ -60,6 +61,24 @@
             <label>Specialization</label>
             <input type="text" id="specialization" name="specialization" />
           </div>
+
+          <div class="form-group">
+            <label>Weekly Availability</label>
+            <div id="weekly-availability-container"></div>
+          </div>
+          <div class="form-group">
+            <label>Date Overrides (e.g., for holidays or special events)</label>
+            <div id="override-availability-container"></div>
+            <button
+              type="button"
+              id="add-override-btn"
+              class="btn"
+              style="margin-top: 10px"
+            >
+              Add Override
+            </button>
+          </div>
+
           <button type="submit" class="btn">Save Staff</button>
         </form>
       </div>

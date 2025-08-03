@@ -20,6 +20,131 @@ document.addEventListener("DOMContentLoaded", () => {
   const saveAssignmentsBtn = document.getElementById("save-assignments-btn");
   let currentStaffId = null;
 
+  // --- Helper function to build availability UI ---
+  function buildAvailabilityUI(availability) {
+    const weeklyContainer = document.getElementById(
+      "weekly-availability-container"
+    );
+    const overrideContainer = document.getElementById(
+      "override-availability-container"
+    );
+    weeklyContainer.innerHTML = "";
+    overrideContainer.innerHTML = "";
+
+    const days = [
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday",
+      "Sunday",
+    ];
+
+    // Build weekly availability UI
+    days.forEach((day) => {
+      const dayData = availability?.weekly?.find((d) => d.day === day) || {
+        isAvailable: true,
+        slots: [{ start: "09:00", end: "17:00" }],
+      };
+      const dayDiv = document.createElement("div");
+      dayDiv.className = "day-availability";
+      dayDiv.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
+          <strong style="width: 100px;">${day}</strong>
+          <input type="checkbox" data-day="${day}" class="is-available-checkbox" ${
+        dayData.isAvailable ? "checked" : ""
+      }>
+          <div class="slots-container" data-day="${day}">
+            ${dayData.slots
+              .map(
+                (slot) => `
+              <div class="slot-group" style="margin-bottom: 5px;">
+                <input type="time" value="${slot.start}"> - <input type="time" value="${slot.end}">
+                <button type="button" class="remove-slot-btn">&times;</button>
+              </div>
+            `
+              )
+              .join("")}
+          </div>
+          <button type="button" class="add-slot-btn" data-day="${day}">+</button>
+        </div>
+      `;
+      weeklyContainer.appendChild(dayDiv);
+    });
+
+    // Build override availability UI
+    if (availability?.overrides) {
+      availability.overrides.forEach((override) => {
+        const overrideDiv = document.createElement("div");
+        overrideDiv.className = "override-availability";
+        overrideDiv.innerHTML = `
+          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
+            <input type="date" value="${override.date}" class="override-date">
+            <input type="checkbox" class="is-available-checkbox" ${
+              override.isAvailable ? "checked" : ""
+            }>
+            <div class="slots-container">
+              ${override.slots
+                .map(
+                  (slot) => `
+                <div class="slot-group" style="margin-bottom: 5px;">
+                  <input type="time" value="${slot.start}"> - <input type="time" value="${slot.end}">
+                  <button type="button" class="remove-slot-btn">&times;</button>
+                </div>
+              `
+                )
+                .join("")}
+            </div>
+            <button type="button" class="add-slot-btn">+</button>
+            <button type="button" class="remove-override-btn">&times;</button>
+          </div>
+        `;
+        overrideContainer.appendChild(overrideDiv);
+      });
+    }
+
+    document.getElementById("add-override-btn").onclick = () => {
+      const overrideDiv = document.createElement("div");
+      overrideDiv.className = "override-availability";
+      overrideDiv.innerHTML = `
+          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
+            <input type="date" class="override-date">
+            <input type="checkbox" class="is-available-checkbox" checked>
+            <div class="slots-container">
+              <div class="slot-group" style="margin-bottom: 5px;">
+                <input type="time" value="09:00"> - <input type="time" value="17:00">
+                <button type="button" class="remove-slot-btn">&times;</button>
+              </div>
+            </div>
+            <button type="button" class="add-slot-btn">+</button>
+            <button type="button" class="remove-override-btn">&times;</button>
+          </div>
+        `;
+      overrideContainer.appendChild(overrideDiv);
+    };
+
+    staffModal.onclick = (e) => {
+      if (e.target.classList.contains("add-slot-btn")) {
+        const slotsContainer = e.target.previousElementSibling;
+        const slotGroup = document.createElement("div");
+        slotGroup.className = "slot-group";
+        slotGroup.style.marginBottom = "5px";
+        slotGroup.innerHTML = `
+          <input type="time" value="09:00"> - <input type="time" value="17:00">
+          <button type="button" class="remove-slot-btn">&times;</button>
+        `;
+        slotsContainer.appendChild(slotGroup);
+      }
+      if (e.target.classList.contains("remove-slot-btn")) {
+        e.target.parentElement.remove();
+      }
+      if (e.target.classList.contains("remove-override-btn")) {
+        e.target.closest(".override-availability").remove();
+      }
+    };
+  }
+
   // --- Staff Management Functions ---
   async function fetchStaff() {
     try {
@@ -40,9 +165,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     staffListContainer.innerHTML = staffList
       .map((staff) => {
-        // Create a list of service names
         const serviceNames = staff.services.map((s) => s.name).join(", ");
-
         return `
         <div class="staff-card" data-id="${staff.id}">
             <div>
@@ -66,6 +189,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function showStaffModal(staff = null) {
     staffForm.reset();
+    buildAvailabilityUI(staff ? staff.availability : null);
+
     if (staff) {
       modalTitle.textContent = "Edit Staff";
       staffIdInput.value = staff.id;
@@ -107,13 +232,12 @@ document.addEventListener("DOMContentLoaded", () => {
       serviceAssignmentContainer.innerHTML = allServices
         .map(
           (service) => `
-            <div>
-                <input type="checkbox" id="service-${service.id}" value="${
+        <div>
+          <input type="checkbox" id="service-${service.id}" value="${
             service.id
-          }" 
-                    ${assignedServiceIds.has(service.id) ? "checked" : ""}>
-                <label for="service-${service.id}">${service.name}</label>
-            </div>`
+          }" ${assignedServiceIds.has(service.id) ? "checked" : ""}>
+          <label for="service-${service.id}">${service.name}</label>
+        </div>`
         )
         .join("");
     } catch (error) {
@@ -133,7 +257,6 @@ document.addEventListener("DOMContentLoaded", () => {
       () => (assignServiceModal.style.display = "none")
     );
 
-  // Main listener for all actions on the staff list
   staffListContainer.addEventListener("click", async (e) => {
     const card = e.target.closest(".staff-card");
     if (!card) return;
@@ -165,12 +288,61 @@ document.addEventListener("DOMContentLoaded", () => {
   staffForm.addEventListener("submit", async (e) => {
     e.preventDefault();
     const id = staffIdInput.value;
+
+    // --- Collect Availability Data ---
+    const availability = {
+      weekly: [],
+      overrides: [],
+    };
+
+    // Weekly
+    document
+      .querySelectorAll("#weekly-availability-container .day-availability")
+      .forEach((dayDiv) => {
+        const day = dayDiv.querySelector("strong").textContent;
+        const isAvailable = dayDiv.querySelector(
+          ".is-available-checkbox"
+        ).checked;
+        const slots = [];
+        dayDiv
+          .querySelectorAll(".slots-container .slot-group")
+          .forEach((slotGroup) => {
+            const inputs = slotGroup.querySelectorAll('input[type="time"]');
+            slots.push({ start: inputs[0].value, end: inputs[1].value });
+          });
+        availability.weekly.push({ day, isAvailable, slots });
+      });
+
+    // Overrides
+    document
+      .querySelectorAll(
+        "#override-availability-container .override-availability"
+      )
+      .forEach((overrideDiv) => {
+        const date = overrideDiv.querySelector(".override-date").value;
+        if (date) {
+          // Only add if a date is selected
+          const isAvailable = overrideDiv.querySelector(
+            ".is-available-checkbox"
+          ).checked;
+          const slots = [];
+          overrideDiv
+            .querySelectorAll(".slots-container .slot-group")
+            .forEach((slotGroup) => {
+              const inputs = slotGroup.querySelectorAll('input[type="time"]');
+              slots.push({ start: inputs[0].value, end: inputs[1].value });
+            });
+          availability.overrides.push({ date, isAvailable, slots });
+        }
+      });
+
     const data = {
       firstName: document.getElementById("firstName").value,
       lastName: document.getElementById("lastName").value,
       email: document.getElementById("email").value,
       phone: document.getElementById("phone").value,
       specialization: document.getElementById("specialization").value,
+      availability: availability, // Add the structured availability data
     };
 
     try {
@@ -190,17 +362,14 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Handle saving service assignments
   saveAssignmentsBtn.addEventListener("click", async () => {
     const checkboxes = serviceAssignmentContainer.querySelectorAll(
       'input[type="checkbox"]'
     );
     const assignedServiceIds = new Set();
-    checkboxes.forEach((cb) => {
-      if (cb.checked) {
-        assignedServiceIds.add(parseInt(cb.value));
-      }
-    });
+    checkboxes.forEach((cb) =>
+      cb.checked ? assignedServiceIds.add(parseInt(cb.value)) : null
+    );
 
     try {
       const staffResponse = await axios.get(`/staff/${currentStaffId}`, {

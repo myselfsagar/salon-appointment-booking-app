@@ -93,24 +93,25 @@ const findFirstAvailableStaff = async (serviceId, appointmentDateTime) => {
       const dayOfWeek = new Date(date)
         .toLocaleString("en-US", { weekday: "long" })
         .toLowerCase();
-      const daySchedule = staff.availability
-        ? staff.availability[dayOfWeek]
-        : undefined;
 
-      if (daySchedule && daySchedule.length > 0) {
-        const workingHours = daySchedule[0].split("-");
-        const [startHour, startMinute] = workingHours[0].split(":").map(Number);
-        const [endHour, endMinute] = workingHours[1].split(":").map(Number);
-        const staffWorkStart = new Date(date);
-        staffWorkStart.setUTCHours(startHour, startMinute, 0, 0);
-        const staffWorkEnd = new Date(date);
-        staffWorkEnd.setUTCHours(endHour, endMinute, 0, 0);
+      const daySchedule = getStaffScheduleForDay(staff, date, dayOfWeek);
 
-        if (
-          potentialSlotStart >= staffWorkStart &&
-          potentialSlotEnd <= staffWorkEnd
-        ) {
-          return staff; // This staff is capable, not busy, and working.
+      if (daySchedule.isAvailable) {
+        for (const slot of daySchedule.slots) {
+          const [startHour, startMinute] = slot.start.split(":").map(Number);
+          const [endHour, endMinute] = slot.end.split(":").map(Number);
+
+          const staffWorkStart = new Date(date);
+          staffWorkStart.setUTCHours(startHour, startMinute, 0, 0);
+          const staffWorkEnd = new Date(date);
+          staffWorkEnd.setUTCHours(endHour, endMinute, 0, 0);
+
+          if (
+            potentialSlotStart >= staffWorkStart &&
+            potentialSlotEnd <= staffWorkEnd
+          ) {
+            return staff; // This staff is capable, not busy, and working.
+          }
         }
       }
     }
@@ -118,6 +119,55 @@ const findFirstAvailableStaff = async (serviceId, appointmentDateTime) => {
 
   return null; // No available staff found
 };
+
+const getStaffScheduleForDay = (staff, date, dayOfWeek) => {
+  if (staff.availability && staff.availability.overrides) {
+    const override = staff.availability.overrides.find((o) => o.date === date);
+    if (override) {
+      return override;
+    }
+  }
+
+  if (staff.availability && staff.availability.weekly) {
+    const weeklySchedule = staff.availability.weekly.find(
+      (d) => d.day.toLowerCase() === dayOfWeek
+    );
+    if (weeklySchedule) {
+      return weeklySchedule;
+    }
+  }
+
+  return { isAvailable: false, slots: [] };
+};
+
+function generateSlotsForStaff(staff, service, date, appointments, dayOfWeek) {
+  const slots = [];
+  const schedule = getStaffScheduleForDay(staff, date, dayOfWeek);
+
+  if (!schedule.isAvailable) return slots;
+
+  for (const slot of schedule.slots) {
+    const [startHour, startMinute] = slot.start.split(":").map(Number);
+    const [endHour, endMinute] = slot.end.split(":").map(Number);
+
+    let slotTime = new Date(date);
+    slotTime.setUTCHours(startHour, startMinute, 0, 0);
+    const staffWorkEnd = new Date(date);
+    staffWorkEnd.setUTCHours(endHour, endMinute, 0, 0);
+
+    while (slotTime < staffWorkEnd) {
+      const slotEndTime = new Date(
+        slotTime.getTime() + service.duration * 60000
+      );
+      if (isSlotAvailable(slotTime, slotEndTime, appointments, staff.id)) {
+        slots.push(slotTime.toISOString());
+      }
+      slotTime = new Date(slotTime.getTime() + service.duration * 60000);
+    }
+  }
+
+  return slots;
+}
 
 const bookAppointment = async (bookingData) => {
   const {
@@ -139,30 +189,6 @@ const bookAppointment = async (bookingData) => {
 
   return appointment;
 };
-
-function generateSlotsForStaff(staff, service, date, appointments, dayOfWeek) {
-  const slots = [];
-  const daySchedule = staff.availability?.[dayOfWeek];
-  if (!daySchedule || daySchedule.length === 0) return slots;
-
-  const [start, end] = daySchedule[0].split("-");
-  const [startHour, startMinute] = start.split(":").map(Number);
-  const [endHour, endMinute] = end.split(":").map(Number);
-
-  let slotTime = new Date(date);
-  slotTime.setUTCHours(startHour, startMinute, 0, 0);
-  const staffWorkEnd = new Date(date);
-  staffWorkEnd.setUTCHours(endHour, endMinute, 0, 0);
-
-  while (slotTime < staffWorkEnd) {
-    const slotEndTime = new Date(slotTime.getTime() + service.duration * 60000);
-    if (isSlotAvailable(slotTime, slotEndTime, appointments, staff.id)) {
-      slots.push(slotTime.toISOString());
-    }
-    slotTime = new Date(slotTime.getTime() + service.duration * 60000);
-  }
-  return slots;
-}
 
 const getAppointmentDetails = async (appointmentId) => {
   const appointment = await Appointment.findByPk(appointmentId, {
