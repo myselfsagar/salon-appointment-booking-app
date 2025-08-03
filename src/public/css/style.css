@@ -422,6 +422,22 @@ nav a {
   background-color: #218838;
 }
 
+/* invoice */
+.invoice-btn {
+  background-color: #6c757d; /* A neutral grey color */
+  color: white;
+  margin-left: 10px;
+}
+.invoice-btn:hover {
+  background-color: #5a6268;
+}
+
+.review-display {
+  margin-top: 15px;
+  padding-top: 10px;
+  border-top: 1px solid #eee;
+}
+
 /* Footer Styles */
 footer {
   text-align: center;

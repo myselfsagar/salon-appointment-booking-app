@@ -135,9 +135,35 @@ document.addEventListener("DOMContentLoaded", () => {
               <button class="btn cancel-btn">Cancel</button>
             </div>`;
         } else if (app.status === "completed" && !app.review) {
-          actionButtons = `<div class="appointment-actions">
-              <button class="btn review-btn">Leave a Review</button>
-            </div>`;
+          let reviewButton = !app.review
+            ? `<button class="btn review-btn">Leave a Review</button>`
+            : "";
+
+          let invoiceButton = `<button class="btn invoice-btn" data-appointment-id="${app.id}">Download Invoice</button>`;
+
+          let staffResponseHtml = "";
+          if (app.review?.staffResponse) {
+            staffResponseHtml = `<div class="staff-response"><strong>Staff Response:</strong> ${app.review.staffResponse}</div>`;
+          }
+
+          actionButtons = `
+            <div class="appointment-actions">
+                ${reviewButton}
+                ${invoiceButton}
+            </div>
+            ${
+              app.review
+                ? `
+            <div class="review-display">
+                <p><strong>Your Review:</strong> ${"★".repeat(
+                  app.review.rating
+                )}${"☆".repeat(5 - app.review.rating)}</p>
+                <p><em>"${app.review.comment}"</em></p>
+                ${staffResponseHtml}
+            </div>`
+                : ""
+            }
+          `;
         } else if (app.review) {
           let staffResponseHtml = "";
           if (app.review.staffResponse) {
@@ -224,6 +250,31 @@ document.addEventListener("DOMContentLoaded", () => {
       const appointmentId = card.dataset.appointmentId;
       document.getElementById("review-appointment-id").value = appointmentId;
       reviewModal.style.display = "block";
+    }
+
+    if (target.classList.contains("invoice-btn")) {
+      const appointmentId = target.dataset.appointmentId;
+      try {
+        const response = await axios.get(
+          `/appointments/${appointmentId}/invoice`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+            responseType: "blob", // Important: tell axios to expect a file
+          }
+        );
+
+        // Create a URL for the blob
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+        const link = document.createElement("a");
+        link.href = url;
+        link.setAttribute("download", `invoice-${appointmentId}.pdf`); // Set the filename
+        document.body.appendChild(link);
+        link.click();
+        link.remove(); // Clean up the temporary link
+      } catch (error) {
+        alert("Could not download the invoice.");
+        console.error("Invoice download error:", error);
+      }
     }
   });
 

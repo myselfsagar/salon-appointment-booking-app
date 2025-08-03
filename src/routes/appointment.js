@@ -38,4 +38,10 @@ router.patch(
   appointmentController.cancelMyAppointment
 );
 
+router.get(
+  "/:id/invoice",
+  authMiddleware,
+  appointmentController.downloadInvoice
+);
+
 module.exports = router;

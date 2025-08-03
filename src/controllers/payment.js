@@ -7,6 +7,7 @@ const serviceServices = require("../services/dbCall.js/serviceServices");
 const emailService = require("../services/emailService"); // Import emailService
 const { sendSuccess } = require("../utils/responseHandler");
 const Appointment = require("../models/Appointment");
+const { generateInvoice } = require("../services/invoiceService");
 
 const instance = new Razorpay({
   key_id: process.env.RAZORPAY_KEY_ID,
@@ -88,6 +89,9 @@ const verifyPayment = asyncHandler(async (req, res, next) => {
         req.user,
         appointmentDetails
       );
+
+      //generate invoice
+      await generateInvoice(appointmentDetails);
 
       sendSuccess(
         res,

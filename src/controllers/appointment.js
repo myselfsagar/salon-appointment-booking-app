@@ -3,6 +3,7 @@ const ErrorHandler = require("../utils/errorHandler");
 const { sendSuccess } = require("../utils/responseHandler");
 const asyncHandler = require("./../utils/asyncHandler");
 const emailService = require("../services/emailService");
+const path = require("path");
 
 const getAvailableSlots = asyncHandler(async (req, res, next) => {
   const { date, serviceId } = req.query; // e.g., date=2025-09-15
@@ -95,6 +96,37 @@ const cancelMyAppointment = asyncHandler(async (req, res, next) => {
   sendSuccess(res, {}, "Appointment cancelled successfully");
 });
 
+const downloadInvoice = asyncHandler(async (req, res, next) => {
+  const { id } = req.params;
+  const customerId = req.user.id;
+
+  const appointment = await appointmentServices.getAppointmentDetails(id);
+
+  // Security check: ensure the person downloading is the one who booked it
+  if (appointment.customerId !== customerId) {
+    return next(
+      new ErrorHandler("You are not authorized to view this invoice.", 403)
+    );
+  }
+
+  const invoicePath = path.join(
+    __dirname,
+    "..",
+    "..",
+    "invoices",
+    `invoice-${id}.pdf`
+  );
+
+  res.download(invoicePath, (err) => {
+    if (err) {
+      console.error("Error downloading invoice:", err);
+      return next(
+        new ErrorHandler("Invoice not found or could not be downloaded.", 404)
+      );
+    }
+  });
+});
+
 module.exports = {
   getAvailableSlots,
   createAppointment,
@@ -103,4 +135,5 @@ module.exports = {
   getAllAppointmentsAdmin,
   updateAppointmentStatusAdmin,
   cancelMyAppointment,
+  downloadInvoice,
 };
