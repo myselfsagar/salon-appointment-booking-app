@@ -96,6 +96,35 @@ const cancelMyAppointment = asyncHandler(async (req, res, next) => {
   sendSuccess(res, {}, "Appointment cancelled successfully");
 });
 
+const rescheduleAppointment = asyncHandler(async (req, res, next) => {
+  const { id } = req.params;
+  const { appointmentDateTime } = req.body;
+  const customerId = req.user.id;
+
+  const rescheduledAppointment =
+    await appointmentServices.rescheduleAppointment(
+      id,
+      customerId,
+      appointmentDateTime
+    );
+
+  // Send rescheduling confirmation email
+  const appointmentDetails = await appointmentServices.getAppointmentDetails(
+    rescheduledAppointment.id
+  );
+  await emailService.sendBookingConfirmationEmail(
+    req.user,
+    appointmentDetails,
+    true
+  );
+
+  sendSuccess(
+    res,
+    rescheduledAppointment,
+    "Appointment rescheduled successfully"
+  );
+});
+
 const downloadInvoice = asyncHandler(async (req, res, next) => {
   const { id } = req.params;
   const customerId = req.user.id;
@@ -135,5 +164,6 @@ module.exports = {
   getAllAppointmentsAdmin,
   updateAppointmentStatusAdmin,
   cancelMyAppointment,
+  rescheduleAppointment,
   downloadInvoice,
 };

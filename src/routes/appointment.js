@@ -18,6 +18,13 @@ router.post(
 
 router.get("/:id", authMiddleware, appointmentController.getAppointmentById);
 
+router.patch(
+  "/:id/reschedule",
+  authMiddleware,
+  validateRequest(schemas.rescheduleAppointment),
+  appointmentController.rescheduleAppointment
+);
+
 router.get(
   "/",
   authMiddleware,

@@ -9,6 +9,7 @@ const sequelize = new Sequelize(
     dialect: process.env.DIALECT,
     port: process.env.DB_PORT || 3306,
     logging: false,
+    timezone: "+05:30",
   }
 );
 

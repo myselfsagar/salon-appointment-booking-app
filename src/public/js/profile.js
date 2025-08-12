@@ -221,28 +221,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     if (target.classList.contains("reschedule-btn")) {
-      if (
-        confirm(
-          "This will cancel your current appointment and let you pick a new time. Are you sure?"
-        )
-      ) {
-        try {
-          await axios.patch(
-            `/appointments/${appointmentId}/cancel`,
-            {},
-            {
-              headers: { Authorization: `Bearer ${token}` },
-            }
-          );
-          // Redirect to booking page to choose a new slot
-          window.location.href = `/booking.html?serviceId=${serviceId}`;
-        } catch (error) {
-          alert(
-            error.response?.data?.message ||
-              "Failed to start rescheduling process."
-          );
-        }
-      }
+      window.location.href = `/booking.html?serviceId=${serviceId}&reschedule=true&appointmentId=${appointmentId}`;
     }
 
     if (target.classList.contains("review-btn")) {

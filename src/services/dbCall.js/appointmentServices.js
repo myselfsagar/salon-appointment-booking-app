@@ -103,9 +103,9 @@ const findFirstAvailableStaff = async (serviceId, appointmentDateTime) => {
           const [endHour, endMinute] = slot.end.split(":").map(Number);
 
           const staffWorkStart = new Date(date);
-          staffWorkStart.setUTCHours(startHour, startMinute, 0, 0);
+          staffWorkStart.setHours(startHour, startMinute, 0, 0);
           const staffWorkEnd = new Date(date);
-          staffWorkEnd.setUTCHours(endHour, endMinute, 0, 0);
+          staffWorkEnd.setHours(endHour, endMinute, 0, 0);
 
           if (
             potentialSlotStart >= staffWorkStart &&
@@ -152,9 +152,9 @@ function generateSlotsForStaff(staff, service, date, appointments, dayOfWeek) {
     const [endHour, endMinute] = slot.end.split(":").map(Number);
 
     let slotTime = new Date(date);
-    slotTime.setUTCHours(startHour, startMinute, 0, 0);
+    slotTime.setHours(startHour, startMinute, 0, 0);
     const staffWorkEnd = new Date(date);
-    staffWorkEnd.setUTCHours(endHour, endMinute, 0, 0);
+    staffWorkEnd.setHours(endHour, endMinute, 0, 0);
 
     while (slotTime < staffWorkEnd) {
       const slotEndTime = new Date(
@@ -296,6 +296,39 @@ const cancelAppointmentByUser = async (appointmentId, customerId) => {
   return appointment;
 };
 
+const rescheduleAppointment = async (
+  appointmentId,
+  customerId,
+  newAppointmentDateTime
+) => {
+  const appointment = await getAppointmentDetails(appointmentId);
+
+  if (appointment.customerId !== customerId) {
+    throw new ErrorHandler(
+      "You are not authorized to reschedule this appointment",
+      403
+    );
+  }
+
+  const availableStaff = await findFirstAvailableStaff(
+    appointment.serviceId,
+    newAppointmentDateTime
+  );
+
+  if (!availableStaff) {
+    throw new ErrorHandler(
+      "The selected time slot is no longer available.",
+      409
+    );
+  }
+
+  appointment.appointmentDateTime = newAppointmentDateTime;
+  appointment.staffId = availableStaff.id;
+  await appointment.save();
+
+  return appointment;
+};
+
 const getAppointmentsForReminders = async (startTime, endTime) => {
   return await Appointment.findAll({
     where: {
@@ -322,5 +355,6 @@ module.exports = {
   getAllAppointments,
   updateAppointmentStatus,
   cancelAppointmentByUser,
+  rescheduleAppointment,
   getAppointmentsForReminders,
 };

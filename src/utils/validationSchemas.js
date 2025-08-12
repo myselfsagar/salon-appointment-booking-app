@@ -192,6 +192,10 @@ const validationSchemas = {
     serviceId: joi.number().integer().required(),
     appointmentDateTime: joi.date().iso().required(),
   }),
+
+  rescheduleAppointment: joi.object({
+    appointmentDateTime: joi.date().iso().required(),
+  }),
 };
 
 module.exports = validationSchemas;

@@ -1,6 +1,8 @@
 document.addEventListener("DOMContentLoaded", () => {
   const params = new URLSearchParams(window.location.search);
   const serviceId = params.get("serviceId");
+  const isReschedule = params.get("reschedule") === "true";
+  const appointmentId = params.get("appointmentId");
   const token = localStorage.getItem("accessToken");
 
   if (!serviceId || !token) {
@@ -113,61 +115,79 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // --- Event Listener for 'Proceed to Payment' Button ---
   proceedToPaymentBtn.addEventListener("click", async () => {
-    try {
-      // Step 1: Create an order on the backend
-      const response = await axios.post(
-        "/payments/create-order",
-        {
-          serviceId: selectedService.id,
-          appointmentDateTime: selectedDateTime,
-        },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      const orderDetails = response.data.data;
+    if (isReschedule) {
+      try {
+        await axios.patch(
+          `/appointments/${appointmentId}/reschedule`,
+          { appointmentDateTime: selectedDateTime },
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        alert("Appointment rescheduled successfully!");
+        window.location.href = "/profile.html";
+      } catch (error) {
+        bookingMessage.textContent =
+          error.response?.data?.message ||
+          "Could not reschedule the appointment.";
+        bookingMessage.className = "form-message error";
+        bookingMessage.style.display = "block";
+      }
+    } else {
+      try {
+        // Step 1: Create an order on the backend
+        const response = await axios.post(
+          "/payments/create-order",
+          {
+            serviceId: selectedService.id,
+            appointmentDateTime: selectedDateTime,
+          },
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        const orderDetails = response.data.data;
 
-      // Step 2: Configure and open Razorpay
-      const options = {
-        key: orderDetails.key,
-        amount: orderDetails.amount,
-        currency: orderDetails.currency,
-        name: "Sagar's Salon & Spa",
-        description: `Appointment for ${orderDetails.serviceName}`,
-        order_id: orderDetails.orderId,
-        handler: async function (response) {
-          // Step 3: Verify the payment
-          try {
-            await axios.post(
-              "/payments/verify-payment",
-              {
-                razorpay_payment_id: response.razorpay_payment_id,
-                razorpay_order_id: response.razorpay_order_id,
-                razorpay_signature: response.razorpay_signature,
-              },
-              { headers: { Authorization: `Bearer ${token}` } }
-            );
-            alert("Payment successful! Your appointment is scheduled.");
-            window.location.href = "/profile.html";
-          } catch (error) {
-            alert("Payment verification failed. Please contact support.");
-          }
-        },
-        prefill: {
-          name: orderDetails.customerName,
-          email: orderDetails.customerEmail,
-          contact: orderDetails.customerPhone,
-        },
-        theme: {
-          color: "#3399cc",
-        },
-      };
+        // Step 2: Configure and open Razorpay
+        const options = {
+          key: orderDetails.key,
+          amount: orderDetails.amount,
+          currency: orderDetails.currency,
+          name: "Sagar's Salon & Spa",
+          description: `Appointment for ${orderDetails.serviceName}`,
+          order_id: orderDetails.orderId,
+          handler: async function (response) {
+            // Step 3: Verify the payment
+            try {
+              await axios.post(
+                "/payments/verify-payment",
+                {
+                  razorpay_payment_id: response.razorpay_payment_id,
+                  razorpay_order_id: response.razorpay_order_id,
+                  razorpay_signature: response.razorpay_signature,
+                },
+                { headers: { Authorization: `Bearer ${token}` } }
+              );
+              alert("Payment successful! Your appointment is scheduled.");
+              window.location.href = "/profile.html";
+            } catch (error) {
+              alert("Payment verification failed. Please contact support.");
+            }
+          },
+          prefill: {
+            name: orderDetails.customerName,
+            email: orderDetails.customerEmail,
+            contact: orderDetails.customerPhone,
+          },
+          theme: {
+            color: "#3399cc",
+          },
+        };
 
-      const rzp = new window.Razorpay(options);
-      rzp.open();
-    } catch (error) {
-      bookingMessage.textContent =
-        error.response?.data?.message || "Could not proceed to payment.";
-      bookingMessage.className = "form-message error";
-      bookingMessage.style.display = "block";
+        const rzp = new window.Razorpay(options);
+        rzp.open();
+      } catch (error) {
+        bookingMessage.textContent =
+          error.response?.data?.message || "Could not proceed to payment.";
+        bookingMessage.className = "form-message error";
+        bookingMessage.style.display = "block";
+      }
     }
   });
 
