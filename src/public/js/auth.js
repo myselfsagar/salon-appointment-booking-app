@@ -1,3 +1,26 @@
+function showToast(message, type = "info") {
+  // type can be 'success' or 'error'
+  const container = document.getElementById("toast-container");
+  if (!container) return;
+
+  const toast = document.createElement("div");
+  toast.className = `toast ${type}`;
+  toast.textContent = message;
+
+  container.appendChild(toast);
+
+  // Trigger the animation
+  setTimeout(() => {
+    toast.classList.add("show");
+  }, 100);
+
+  // Hide and remove the toast after a few seconds
+  setTimeout(() => {
+    toast.classList.remove("show");
+    toast.addEventListener("transitionend", () => toast.remove());
+  }, 4000);
+}
+
 // --- Globally Accessible Functions ---
 function openModal(formToShow = "login") {
   const authModal = document.getElementById("auth-modal");

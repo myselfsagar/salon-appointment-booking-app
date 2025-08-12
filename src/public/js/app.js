@@ -4,29 +4,26 @@ document.addEventListener("DOMContentLoaded", () => {
     loginForm: document.getElementById("login-form"),
     signupForm: document.getElementById("signup-form"),
     forgotPasswordForm: document.getElementById("forgot-password-form"),
-    formMessage: document.getElementById("form-message"),
     showSignup: document.getElementById("show-signup"),
     showLogin: document.getElementById("show-login"),
     showForgotPassword: document.getElementById("show-forgot-password"),
     backToLogin: document.getElementById("back-to-login"),
   };
 
-  // Helper function to show messages
-  let messageTimeout;
-  function showMessage(message, isError = false) {
-    elements.formMessage.textContent = message;
-    elements.formMessage.className = `form-message ${
-      isError ? "error" : "success"
-    }`;
-    elements.formMessage.style.display = "block";
-    clearTimeout(messageTimeout);
-    messageTimeout = setTimeout(() => {
-      elements.formMessage.style.display = "none";
-    }, 3000);
-  }
-
   function getFormData(form) {
     return Object.fromEntries(new FormData(form).entries());
+  }
+
+  // Helper to manage button loading state
+  function setLoading(form, isLoading) {
+    const button = form.querySelector('button[type="submit"]');
+    if (isLoading) {
+      button.disabled = true;
+      button.textContent = "Processing...";
+    } else {
+      button.disabled = false;
+      button.textContent = button.dataset.originalText || button.textContent;
+    }
   }
 
   // --- Form Switching (re-uses openModal from auth.js which is loading first in the html) ---
@@ -50,56 +47,68 @@ document.addEventListener("DOMContentLoaded", () => {
   // --- Form Handlers ---
   elements.signupForm.addEventListener("submit", async (e) => {
     e.preventDefault();
+    setLoading(elements.signupForm, true);
     const data = getFormData(elements.signupForm);
     try {
       const response = await axios.post("/auth/signup", data);
-      showMessage(response.data.message || "Signup successful! Please log in.");
+      showToast(
+        response.data.message || "Signup successful! Please log in.",
+        "success"
+      );
       elements.signupForm.reset();
       setTimeout(() => openModal("login"), 1500);
     } catch (error) {
-      showMessage(error.response?.data?.message || "An error occurred.", true);
+      showToast(error.response?.data?.message || "An error occurred.", "error");
+    } finally {
+      setLoading(elements.signupForm, false);
     }
   });
 
   elements.loginForm.addEventListener("submit", async (e) => {
     e.preventDefault();
+    setLoading(elements.loginForm, true);
     const data = getFormData(elements.loginForm);
     try {
       const response = await axios.post("/auth/login", data);
       const { access_token, role } = response.data.data;
 
-      // Store the token
       localStorage.setItem("accessToken", access_token);
       localStorage.setItem("userRole", role);
 
-      showMessage("Login successful! Redirecting...");
+      showToast("Login successful! Redirecting...", "success");
 
-      // Redirect based on role
-      if (role === "admin" || role === "staff") {
-        window.location.href = "/admin/staff.html";
-      } else {
-        window.location.href = "/"; // Redirect customers to the homepage
-      }
+      setTimeout(() => {
+        if (role === "admin" || role === "staff") {
+          window.location.href = "/admin/staff.html";
+        } else {
+          window.location.href = "/";
+        }
+      }, 1000);
     } catch (error) {
-      showMessage(
+      showToast(
         error.response?.data?.message || "Invalid credentials.",
-        true
+        "error"
       );
+      setLoading(elements.loginForm, false);
     }
   });
 
   elements.forgotPasswordForm.addEventListener("submit", async (e) => {
     e.preventDefault();
+    setLoading(elements.forgotPasswordForm, true);
     const data = getFormData(elements.forgotPasswordForm);
     try {
       const response = await axios.post("/password/forgotPassword", data);
-      showMessage(
+      showToast(
         response.data.message ||
-          "If an account exists, a reset link has been sent."
+          "If an account exists, a reset link has been sent.",
+        "success"
       );
       elements.forgotPasswordForm.reset();
     } catch (error) {
-      showMessage(error.response?.data?.message || "An error occurred.", true);
+      showToast(error.response?.data?.message || "An error occurred.", "error");
+    } finally {
+      setLoading(elements.forgotPasswordForm, false);
     }
   });
 });
