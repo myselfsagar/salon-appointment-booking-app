@@ -1,5 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
   const token = localStorage.getItem("accessToken");
+  const userRole = localStorage.getItem("userRole");
+
   if (!token) {
     window.location.href = "/";
     return;
@@ -19,6 +21,11 @@ document.addEventListener("DOMContentLoaded", () => {
   );
   const saveAssignmentsBtn = document.getElementById("save-assignments-btn");
   let currentStaffId = null;
+
+  // Hide admin-only elements if the user is not an admin
+  if (userRole !== "admin") {
+    addStaffBtn.style.display = "none";
+  }
 
   // --- Helper function to build availability UI ---
   function buildAvailabilityUI(availability) {
@@ -166,6 +173,16 @@ document.addEventListener("DOMContentLoaded", () => {
     staffListContainer.innerHTML = staffList
       .map((staff) => {
         const serviceNames = staff.services.map((s) => s.name).join(", ");
+
+        // Conditionally render admin-only buttons
+        const adminActions =
+          userRole === "admin"
+            ? `
+            <button class="btn assign-btn">Assign Services</button>
+            <button class="btn delete-btn" style="background-color: #dc3545;">Delete</button>
+        `
+            : "";
+
         return `
         <div class="staff-card" data-id="${staff.id}">
             <div>
@@ -178,9 +195,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 </div>
             </div>
             <div class="staff-actions">
-                <button class="btn assign-btn">Assign Services</button>
                 <button class="btn edit-btn">Edit</button>
-                <button class="btn delete-btn" style="background-color: #dc3545;">Delete</button>
+                ${adminActions}
             </div>
         </div>`;
       })

@@ -71,12 +71,18 @@
             </div>
             <div class="form-group">
               <label for="login-password">Password</label>
-              <input
-                type="password"
-                id="login-password"
-                name="password"
-                required
-              />
+              <div class="password-container">
+                <input
+                  type="password"
+                  id="login-password"
+                  name="password"
+                  required
+                />
+                <i
+                  class="fas fa-eye password-toggle"
+                  id="toggle-login-password"
+                ></i>
+              </div>
             </div>
             <p class="form-switch-forgot-password">
               <a href="#" id="show-forgot-password">Forgot Password?</a>
@@ -137,12 +143,18 @@
             </div>
             <div class="form-group">
               <label for="signup-password">Password</label>
-              <input
-                type="password"
-                id="signup-password"
-                name="password"
-                required
-              />
+              <div class="password-container">
+                <input
+                  type="password"
+                  id="signup-password"
+                  name="password"
+                  required
+                />
+                <i
+                  class="fas fa-eye password-toggle"
+                  id="toggle-signup-password"
+                ></i>
+              </div>
             </div>
             <button type="submit" class="btn">Sign Up</button>
           </form>

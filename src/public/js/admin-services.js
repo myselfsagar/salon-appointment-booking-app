@@ -1,5 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
   const token = localStorage.getItem("accessToken");
+  const userRole = localStorage.getItem("userRole");
+
   if (!token) {
     window.location.href = "/";
     return;
@@ -14,6 +16,11 @@ document.addEventListener("DOMContentLoaded", () => {
   const serviceForm = document.getElementById("service-form");
   const modalTitle = document.getElementById("modal-title");
   const serviceIdInput = document.getElementById("service-id");
+
+  // Hide admin-only elements if the user is not an admin
+  if (userRole !== "admin") {
+    addServiceBtn.style.display = "none";
+  }
 
   // Fetch and render all services
   async function fetchServices() {
@@ -45,6 +52,12 @@ document.addEventListener("DOMContentLoaded", () => {
           } ★ (${reviewCount} reviews)`;
         }
 
+        // Conditionally render the delete button for admins only
+        const deleteButton =
+          userRole === "admin"
+            ? `<button class="btn delete-btn" style="background-color: #dc3545;">Delete</button>`
+            : "";
+
         return `
             <div class="service-admin-card" data-id="${service.id}">
                 <div>
@@ -54,7 +67,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 </div>
                 <div class="service-actions">
                     <button class="btn edit-btn">Edit</button>
-                    <button class="btn delete-btn" style="background-color: #dc3545;">Delete</button>
+                    ${deleteButton}
                 </div>
             </div>
             `;

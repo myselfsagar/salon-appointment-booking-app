@@ -295,6 +295,24 @@ nav a:hover {
   background-color: var(--error-color);
 }
 
+/* ===== Password Visibility Toggle ===== */
+.password-container {
+  position: relative;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: #aaa;
+}
+
+.password-toggle:hover {
+  color: var(--text-dark);
+}
+
 /* ===== FOOTER ===== */
 footer {
   text-align: center;

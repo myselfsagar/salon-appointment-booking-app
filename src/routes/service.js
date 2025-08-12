@@ -28,7 +28,7 @@ router.put(
 router.delete(
   "/:id",
   authMiddleware,
-  checkRole("staff", "admin"),
+  checkRole("admin"),
   serviceControllers.deleteService
 );
 

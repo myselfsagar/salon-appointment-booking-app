@@ -8,7 +8,32 @@ document.addEventListener("DOMContentLoaded", () => {
     showLogin: document.getElementById("show-login"),
     showForgotPassword: document.getElementById("show-forgot-password"),
     backToLogin: document.getElementById("back-to-login"),
+    toggleLoginPassword: document.getElementById("toggle-login-password"),
+    toggleSignupPassword: document.getElementById("toggle-signup-password"),
   };
+
+  // --- Password Visibility Toggle ---
+  function setupPasswordToggle(toggleEl, inputEl) {
+    if (toggleEl && inputEl) {
+      toggleEl.addEventListener("click", () => {
+        const type =
+          inputEl.getAttribute("type") === "password" ? "text" : "password";
+        inputEl.setAttribute("type", type);
+        // Toggle the icon class
+        toggleEl.classList.toggle("fa-eye");
+        toggleEl.classList.toggle("fa-eye-slash");
+      });
+    }
+  }
+
+  setupPasswordToggle(
+    elements.toggleLoginPassword,
+    document.getElementById("login-password")
+  );
+  setupPasswordToggle(
+    elements.toggleSignupPassword,
+    document.getElementById("signup-password")
+  );
 
   function getFormData(form) {
     return Object.fromEntries(new FormData(form).entries());
@@ -18,11 +43,16 @@ document.addEventListener("DOMContentLoaded", () => {
   function setLoading(form, isLoading) {
     const button = form.querySelector('button[type="submit"]');
     if (isLoading) {
+      // Store the button's original text if it's not already stored
+      if (!button.dataset.originalText) {
+        button.dataset.originalText = button.textContent;
+      }
       button.disabled = true;
       button.textContent = "Processing...";
     } else {
       button.disabled = false;
-      button.textContent = button.dataset.originalText || button.textContent;
+      // Restore the original text
+      button.textContent = button.dataset.originalText;
     }
   }
 
@@ -89,6 +119,7 @@ document.addEventListener("DOMContentLoaded", () => {
         error.response?.data?.message || "Invalid credentials.",
         "error"
       );
+      // This line was missing. It resets the button state on error.
       setLoading(elements.loginForm, false);
     }
   });
