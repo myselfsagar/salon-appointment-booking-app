@@ -52,7 +52,7 @@ const sendBookingConfirmationEmail = async (user, appointmentDetails) => {
   const staffName = `${appointmentDetails.staff_profile.user.firstName} ${appointmentDetails.staff_profile.user.lastName}`;
   const formattedDate = new Date(
     appointmentDetails.appointmentDateTime
-  ).toLocaleString();
+  ).toLocaleString("en-IN", { timeZone: "Asia/Kolkata" });
 
   await tranEmailApi.sendTransacEmail({
     sender,
@@ -88,7 +88,7 @@ const sendAppointmentReminderEmail = async (user, appointmentDetails) => {
   const staffName = `${appointmentDetails.staff_profile.user.firstName} ${appointmentDetails.staff_profile.user.lastName}`;
   const formattedDate = new Date(
     appointmentDetails.appointmentDateTime
-  ).toLocaleString();
+  ).toLocaleString("en-IN", { timeZone: "Asia/Kolkata" });
 
   await tranEmailApi.sendTransacEmail({
     sender,

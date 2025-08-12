@@ -4,6 +4,9 @@ const routes = require("./routes");
 const errorMiddleware = require("./middlewares/errorMiddleware");
 const app = express();
 
+// Set the timezone for the entire application
+process.env.TZ = "Asia/Kolkata";
+
 //connect to db
 const dbConnection = require("./utils/dbConnect");
 
