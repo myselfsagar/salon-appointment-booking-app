@@ -12,6 +12,11 @@ document.addEventListener("DOMContentLoaded", () => {
   const serviceFilter = document.getElementById("service-filter");
   const staffFilter = document.getElementById("staff-filter");
   const resetFiltersBtn = document.getElementById("reset-filters-btn");
+  const paginationContainer = document.getElementById("pagination-container");
+
+  // Pagination State
+  let currentPage = 1;
+  const limit = 10;
 
   // --- Populate Filter Dropdowns ---
   async function populateFilters() {
@@ -46,24 +51,30 @@ document.addEventListener("DOMContentLoaded", () => {
   // --- Fetch and Render Appointments ---
   async function fetchAppointments() {
     try {
-      const selectedDate = dateFilter.value;
-      const selectedService = serviceFilter.value;
-      const selectedStaff = staffFilter.value;
-
       const config = {
         headers: { Authorization: `Bearer ${token}` },
-        params: {},
+        params: {
+          date: dateFilter.value || undefined,
+          serviceId: serviceFilter.value || undefined,
+          staffId: staffFilter.value || undefined,
+          page: currentPage,
+          limit: limit,
+        },
       };
 
-      if (selectedDate) config.params.date = selectedDate;
-      if (selectedService) config.params.serviceId = selectedService;
-      if (selectedStaff) config.params.staffId = selectedStaff;
-
       const response = await axios.get("/appointments", config);
-      renderAppointmentList(response.data.data);
+      const {
+        appointments,
+        totalPages,
+        currentPage: page,
+      } = response.data.data;
+
+      renderAppointmentList(appointments);
+      renderPaginationControls(totalPages, page);
     } catch (error) {
       appointmentListContainer.innerHTML =
         "<p>Failed to load appointments.</p>";
+      paginationContainer.innerHTML = ""; // Clear pagination on error
     }
   }
 
@@ -115,7 +126,61 @@ document.addEventListener("DOMContentLoaded", () => {
       .join("");
   }
 
+  // --- Render Pagination Controls (New Function) ---
+  function renderPaginationControls(totalPages, page) {
+    paginationContainer.innerHTML = ""; // Clear old controls
+    if (totalPages <= 1) return;
+
+    const prevButton = document.createElement("button");
+    prevButton.textContent = "Previous";
+    prevButton.className = "btn";
+    prevButton.disabled = page === 1;
+    prevButton.addEventListener("click", () => {
+      if (currentPage > 1) {
+        currentPage--;
+        fetchAppointments();
+      }
+    });
+
+    const pageIndicator = document.createElement("span");
+    pageIndicator.textContent = `Page ${page} of ${totalPages}`;
+    pageIndicator.style.margin = "0 1rem";
+
+    const nextButton = document.createElement("button");
+    nextButton.textContent = "Next";
+    nextButton.className = "btn";
+    nextButton.disabled = page === totalPages;
+    nextButton.addEventListener("click", () => {
+      if (currentPage < totalPages) {
+        currentPage++;
+        fetchAppointments();
+      }
+    });
+
+    paginationContainer.style.textAlign = "center";
+    paginationContainer.style.marginTop = "2rem";
+    paginationContainer.appendChild(prevButton);
+    paginationContainer.appendChild(pageIndicator);
+    paginationContainer.appendChild(nextButton);
+  }
+
   // --- Event Listeners ---
+  function handleFilterChange() {
+    currentPage = 1; // Reset to the first page on any filter change
+    fetchAppointments();
+  }
+
+  dateFilter.addEventListener("change", handleFilterChange);
+  serviceFilter.addEventListener("change", handleFilterChange);
+  staffFilter.addEventListener("change", handleFilterChange);
+
+  resetFiltersBtn.addEventListener("click", () => {
+    dateFilter.value = "";
+    serviceFilter.selectedIndex = 0;
+    staffFilter.selectedIndex = 0;
+    handleFilterChange();
+  });
+
   appointmentListContainer.addEventListener("change", async (e) => {
     if (e.target.classList.contains("status-select")) {
       const appointmentId = e.target.closest(".appointment-admin-card").dataset
@@ -136,21 +201,6 @@ document.addEventListener("DOMContentLoaded", () => {
         fetchAppointments(); // Revert dropdown on failure
       }
     }
-  });
-
-  dateFilter.addEventListener("change", fetchAppointments);
-  serviceFilter.addEventListener("change", fetchAppointments);
-  staffFilter.addEventListener("change", fetchAppointments);
-
-  // Add event listener for the new reset button
-  resetFiltersBtn.addEventListener("click", () => {
-    // Reset the value of each filter control
-    dateFilter.value = "";
-    serviceFilter.selectedIndex = 0;
-    staffFilter.selectedIndex = 0;
-
-    // Fetch the appointments again with the cleared filters
-    fetchAppointments();
   });
 
   // --- Initial Load ---

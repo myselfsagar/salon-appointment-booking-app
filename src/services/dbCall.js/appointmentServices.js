@@ -228,33 +228,30 @@ const getAppointmentsByCustomerId = async (customerId) => {
   }
 };
 
-const getAllAppointments = async ({ date, serviceId, staffId }) => {
+const getAllAppointments = async ({
+  date,
+  serviceId,
+  staffId,
+  page,
+  limit,
+}) => {
   try {
     const whereCondition = {};
+    const offset = (page - 1) * limit;
 
-    // If a date is provided, filter appointments for that specific day
     if (date) {
       const startDate = new Date(date);
       startDate.setHours(0, 0, 0, 0);
       const endDate = new Date(date);
       endDate.setHours(23, 59, 59, 999);
-
       whereCondition.appointmentDateTime = {
         [Op.between]: [startDate, endDate],
       };
     }
+    if (serviceId) whereCondition.serviceId = serviceId;
+    if (staffId) whereCondition.staffId = staffId;
 
-    // Add serviceId to the where condition if it exists
-    if (serviceId) {
-      whereCondition.serviceId = serviceId;
-    }
-
-    // Add staffId to the where condition if it exists
-    if (staffId) {
-      whereCondition.staffId = staffId;
-    }
-
-    const appointments = await Appointment.findAll({
+    const { count, rows } = await Appointment.findAndCountAll({
       where: whereCondition,
       include: [
         { model: Service, attributes: ["name"] },
@@ -265,8 +262,16 @@ const getAllAppointments = async ({ date, serviceId, staffId }) => {
         { model: User, as: "user", attributes: ["firstName", "lastName"] },
       ],
       order: [["appointmentDateTime", "DESC"]],
+      limit,
+      offset,
     });
-    return appointments;
+
+    return {
+      appointments: rows,
+      totalPages: Math.ceil(count / limit),
+      currentPage: page,
+      totalItems: count,
+    };
   } catch (error) {
     throw error;
   }

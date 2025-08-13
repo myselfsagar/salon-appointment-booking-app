@@ -67,13 +67,15 @@ const getMyAppointments = asyncHandler(async (req, res, next) => {
 });
 
 const getAllAppointmentsAdmin = asyncHandler(async (req, res, next) => {
-  const { date, serviceId, staffId } = req.query;
-  const appointments = await appointmentServices.getAllAppointments({
+  const { date, serviceId, staffId, page = 1, limit = 10 } = req.query;
+  const appointmentsData = await appointmentServices.getAllAppointments({
     date,
     serviceId,
     staffId,
+    page: parseInt(page),
+    limit: parseInt(limit),
   });
-  sendSuccess(res, appointments, "All appointments fetched");
+  sendSuccess(res, appointmentsData, "All appointments fetched");
 });
 
 const updateAppointmentStatusAdmin = asyncHandler(async (req, res, next) => {
