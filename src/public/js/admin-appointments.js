@@ -9,20 +9,55 @@ document.addEventListener("DOMContentLoaded", () => {
     "appointment-list-container"
   );
   const dateFilter = document.getElementById("date-filter");
+  const serviceFilter = document.getElementById("service-filter");
+  const staffFilter = document.getElementById("staff-filter");
+  const resetFiltersBtn = document.getElementById("reset-filters-btn");
 
+  // --- Populate Filter Dropdowns ---
+  async function populateFilters() {
+    try {
+      const [servicesRes, staffRes] = await Promise.all([
+        axios.get("/services", {
+          headers: { Authorization: `Bearer ${token}` },
+        }),
+        axios.get("/staff", { headers: { Authorization: `Bearer ${token}` } }),
+      ]);
+
+      // Populate services
+      servicesRes.data.data.forEach((service) => {
+        const option = document.createElement("option");
+        option.value = service.id;
+        option.textContent = service.name;
+        serviceFilter.appendChild(option);
+      });
+
+      // Populate staff
+      staffRes.data.data.forEach((staff) => {
+        const option = document.createElement("option");
+        option.value = staff.id;
+        option.textContent = `${staff.user.firstName} ${staff.user.lastName}`;
+        staffFilter.appendChild(option);
+      });
+    } catch (error) {
+      console.error("Failed to populate filters:", error);
+    }
+  }
+
+  // --- Fetch and Render Appointments ---
   async function fetchAppointments() {
     try {
       const selectedDate = dateFilter.value;
+      const selectedService = serviceFilter.value;
+      const selectedStaff = staffFilter.value;
 
-      // Build the params for the API call
       const config = {
         headers: { Authorization: `Bearer ${token}` },
         params: {},
       };
 
-      if (selectedDate) {
-        config.params.date = selectedDate;
-      }
+      if (selectedDate) config.params.date = selectedDate;
+      if (selectedService) config.params.serviceId = selectedService;
+      if (selectedStaff) config.params.staffId = selectedStaff;
 
       const response = await axios.get("/appointments", config);
       renderAppointmentList(response.data.data);
@@ -34,7 +69,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function renderAppointmentList(appointments) {
     if (appointments.length === 0) {
-      appointmentListContainer.innerHTML = "<p>No appointments found.</p>";
+      appointmentListContainer.innerHTML =
+        "<p>No appointments found for the selected filters.</p>";
       return;
     }
 
@@ -54,7 +90,6 @@ document.addEventListener("DOMContentLoaded", () => {
           timeStyle: "short",
         });
 
-        // Create the status dropdown
         const statusOptions = ["scheduled", "completed", "cancelled"]
           .map(
             (s) =>
@@ -80,7 +115,7 @@ document.addEventListener("DOMContentLoaded", () => {
       .join("");
   }
 
-  // Add an event listener to handle status changes
+  // --- Event Listeners ---
   appointmentListContainer.addEventListener("change", async (e) => {
     if (e.target.classList.contains("status-select")) {
       const appointmentId = e.target.closest(".appointment-admin-card").dataset
@@ -95,16 +130,30 @@ document.addEventListener("DOMContentLoaded", () => {
             headers: { Authorization: `Bearer ${token}` },
           }
         );
-        alert("Status updated successfully!");
-        // You might want to add a visual confirmation instead of an alert
+        showToast("Status updated successfully!", "success");
       } catch (error) {
-        alert("Failed to update status.");
-        // Revert the dropdown on failure
-        fetchAppointments();
+        showToast("Failed to update status.", "error");
+        fetchAppointments(); // Revert dropdown on failure
       }
     }
   });
 
   dateFilter.addEventListener("change", fetchAppointments);
+  serviceFilter.addEventListener("change", fetchAppointments);
+  staffFilter.addEventListener("change", fetchAppointments);
+
+  // Add event listener for the new reset button
+  resetFiltersBtn.addEventListener("click", () => {
+    // Reset the value of each filter control
+    dateFilter.value = "";
+    serviceFilter.selectedIndex = 0;
+    staffFilter.selectedIndex = 0;
+
+    // Fetch the appointments again with the cleared filters
+    fetchAppointments();
+  });
+
+  // --- Initial Load ---
+  populateFilters();
   fetchAppointments();
 });

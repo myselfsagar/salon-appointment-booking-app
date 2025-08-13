@@ -51,7 +51,21 @@
             <label for="date-filter">Filter by Date:</label>
             <input type="date" id="date-filter" class="form-control" />
           </div>
+          <div class="form-group">
+            <label for="service-filter">Filter by Service:</label>
+            <select id="service-filter" class="form-control">
+              <option value="">All Services</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="staff-filter">Filter by Staff:</label>
+            <select id="staff-filter" class="form-control">
+              <option value="">All Staff</option>
+            </select>
+          </div>
+          <button id="reset-filters-btn" class="btn">Reset Filters</button>
         </div>
+
         <div id="appointment-list-container"></div>
       </section>
     </main>

@@ -228,7 +228,7 @@ const getAppointmentsByCustomerId = async (customerId) => {
   }
 };
 
-const getAllAppointments = async (date) => {
+const getAllAppointments = async ({ date, serviceId, staffId }) => {
   try {
     const whereCondition = {};
 
@@ -242,6 +242,16 @@ const getAllAppointments = async (date) => {
       whereCondition.appointmentDateTime = {
         [Op.between]: [startDate, endDate],
       };
+    }
+
+    // Add serviceId to the where condition if it exists
+    if (serviceId) {
+      whereCondition.serviceId = serviceId;
+    }
+
+    // Add staffId to the where condition if it exists
+    if (staffId) {
+      whereCondition.staffId = staffId;
     }
 
     const appointments = await Appointment.findAll({

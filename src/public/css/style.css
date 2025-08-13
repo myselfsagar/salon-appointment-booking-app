@@ -259,6 +259,20 @@ nav a:hover {
   text-align: right;
 }
 
+/* Custom style for the filter reset button */
+#reset-filters-btn {
+  background-color: #6c757d;
+  color: white;
+  margin-left: 1rem;
+  align-self: flex-end;
+  margin-bottom: 20px;
+}
+
+#reset-filters-btn:hover {
+  background-color: #5a6268;
+  transform: translateY(0);
+}
+
 /* ===== TOAST NOTIFICATIONS (NEW) ===== */
 #toast-container {
   position: fixed;
