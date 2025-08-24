@@ -92,21 +92,7 @@ const updateStaff = async (data) => {
       throw new ErrorHandler("Staff not found", 404);
     }
 
-    const user = await User.findByPk(staffProfile.userId);
-    if (!user) {
-      throw new ErrorHandler("Associated user not found", 404);
-    }
-
-    // --- Update User Model ---
-    const userUpdateFields = {};
-    if (data.firstName) userUpdateFields.firstName = data.firstName;
-    if (data.lastName) userUpdateFields.lastName = data.lastName;
-    if (data.email) userUpdateFields.email = data.email;
-    if (data.phone) userUpdateFields.phone = data.phone;
-
-    if (Object.keys(userUpdateFields).length > 0) {
-      await user.update(userUpdateFields);
-    }
+    await updateUserById(staffProfile.userId, data);
 
     // --- Update StaffProfile Model ---
     const staffProfileUpdateFields = {};
@@ -121,7 +107,7 @@ const updateStaff = async (data) => {
 
     // Fetch and return the updated staff profile
     const updatedStaff = await StaffProfile.findByPk(data.staffId, {
-      include: [User], // Include user data in the response
+      include: [User],
     });
 
     return updatedStaff;

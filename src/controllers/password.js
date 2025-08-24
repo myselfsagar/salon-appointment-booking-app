@@ -41,6 +41,10 @@ const updatepassword = asyncHandler(async (request, response, next) => {
   const { resetId, newPassword } = request.body;
   const passwordReset = await ForgotPassword.findByPk(resetId);
 
+  if (!passwordReset || !passwordReset.isActive) {
+    throw new ErrorHandler("Link has expired or is invalid", 403);
+  }
+
   const currentTime = new Date();
   const createdAtTime = new Date(passwordReset.createdAt);
   const timeDifference = currentTime - createdAtTime;

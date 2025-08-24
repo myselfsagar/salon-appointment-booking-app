@@ -50,17 +50,7 @@ const getUserById = async (userId) => {
 
 const updateMyProfile = async (data) => {
   try {
-    const updateFields = {};
-    if (data.firstName) updateFields.firstName = data.firstName;
-    if (data.lastName) updateFields.lastName = data.lastName;
-    if (data.phone) updateFields.phone = data.phone;
-
-    // Update and return the updated user
-    await User.update(updateFields, { where: { id: data.id } });
-    const updatedUser = await User.findByPk(data.id);
-
-    delete updatedUser.password;
-    return updatedUser;
+    return await updateUserById(data.id, data);
   } catch (error) {
     throw error;
   }
@@ -91,7 +81,9 @@ const updateUserById = async (userId, data) => {
     if (data.phone) updateFields.phone = data.phone;
     if (data.role) updateFields.role = data.role;
 
-    await user.update(updateFields);
+    if (Object.keys(updateFields).length > 0) {
+      await user.update(updateFields);
+    }
 
     const updatedUser = await User.findByPk(userId, {
       attributes: { exclude: ["password"] },
