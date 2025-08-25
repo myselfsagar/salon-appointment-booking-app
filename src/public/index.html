@@ -21,10 +21,17 @@
 
     <header>
       <nav>
-        <div class="logo">
+        <a href="/" class="logo">
           <img src="/images/logo.png" alt="Logo" />
           <h1>Sagar's Salon & Spa</h1>
-        </div>
+        </a>
+        <button
+          id="mobile-menu-btn"
+          class="mobile-menu-toggle"
+          aria-label="Open Menu"
+        >
+          <i class="fas fa-bars"></i>
+        </button>
         <ul id="nav-links">
           <li><a href="/">Home</a></li>
           <li><a href="/services.html">Services</a></li>
@@ -51,11 +58,64 @@
 
     <main>
       <section class="hero">
-        <h2>Welcome to Your Beauty Escape</h2>
-        <p>
-          Book your next appointment with us and experience the best in town.
-        </p>
-        <a href="/services.html" class="btn">Book Now</a>
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+          <h2>Welcome to Your Beauty Escape</h2>
+          <p>
+            Experience tranquility and style at the hands of our expert artists.
+          </p>
+          <a href="/services.html" class="btn">Explore Our Services</a>
+        </div>
+      </section>
+
+      <section class="featured-services">
+        <h3 class="section-title">Our Popular Services</h3>
+        <div class="services-grid">
+          <div class="service-item">
+            <i class="fas fa-cut service-icon"></i>
+            <h4>Hair Styling</h4>
+            <p>
+              From classic cuts to modern styles, our stylists will create a
+              look you love.
+            </p>
+          </div>
+          <div class="service-item">
+            <i class="fas fa-spa service-icon"></i>
+            <h4>Relaxing Facials</h4>
+            <p>
+              Rejuvenate your skin with our custom facials, tailored to your
+              skin type.
+            </p>
+          </div>
+          <div class="service-item">
+            <i class="fas fa-hand-sparkles service-icon"></i>
+            <h4>Manicures & Pedicures</h4>
+            <p>Indulge in a luxurious treatment for your hands and feet.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="testimonials">
+        <h3 class="section-title">What Our Clients Say</h3>
+        <div class="testimonial-grid">
+          <div class="testimonial-card">
+            <p>
+              "An absolutely amazing experience! The staff were so professional
+              and friendly. I left feeling refreshed and beautiful. Highly
+              recommend!"
+            </p>
+            <h4>- Jessica L.</h4>
+            <div class="stars">★★★★★</div>
+          </div>
+          <div class="testimonial-card">
+            <p>
+              "I've been coming to Sagar's Salon for years. The quality of
+              service is consistently excellent. My go-to place for a haircut."
+            </p>
+            <h4>- Mike R.</h4>
+            <div class="stars">★★★★★</div>
+          </div>
+        </div>
       </section>
     </main>
 
@@ -167,7 +227,22 @@
     </div>
 
     <footer>
-      <p>&copy; 2025 Sagar's Salon & Spa. All Rights Reserved.</p>
+      <div class="footer-content">
+        <h4>Sagar's Salon & Spa</h4>
+        <p>123 Beauty Lane, Bengaluru, KA 560001</p>
+        <div class="social-links">
+          <a href="#" aria-label="Facebook"
+            ><i class="fab fa-facebook-f"></i
+          ></a>
+          <a href="#" aria-label="Instagram"
+            ><i class="fab fa-instagram"></i
+          ></a>
+          <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+        </div>
+        <p class="copyright">
+          &copy; 2025 Sagar's Salon & Spa. All Rights Reserved.
+        </p>
+      </div>
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>

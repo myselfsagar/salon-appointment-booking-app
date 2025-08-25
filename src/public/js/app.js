@@ -142,4 +142,26 @@ document.addEventListener("DOMContentLoaded", () => {
       setLoading(elements.forgotPasswordForm, false);
     }
   });
+
+  // --- Mobile Menu Toggle ---
+  const menuBtn = document.getElementById("mobile-menu-btn");
+  const navLinks = document.getElementById("nav-links");
+
+  // Check if the elements exist on the page
+  if (menuBtn && navLinks) {
+    const menuIcon = menuBtn.querySelector("i");
+
+    menuBtn.addEventListener("click", () => {
+      navLinks.classList.toggle("nav-active");
+
+      // Optional: Change icon from hamburger to 'X' and back
+      if (navLinks.classList.contains("nav-active")) {
+        menuIcon.classList.remove("fa-bars");
+        menuIcon.classList.add("fa-times");
+      } else {
+        menuIcon.classList.remove("fa-times");
+        menuIcon.classList.add("fa-bars");
+      }
+    });
+  }
 });
