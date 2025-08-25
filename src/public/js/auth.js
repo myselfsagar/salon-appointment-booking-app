@@ -1,3 +1,22 @@
+// Create a new Axios instance with a custom configuration
+const api = axios.create();
+
+// Add a request interceptor
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem("accessToken");
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+
+    return config;
+  },
+  (error) => {
+    window.location.href = "../home";
+    return Promise.reject(error);
+  }
+);
+
 function showToast(message, type = "info") {
   // type can be 'success' or 'error'
   const container = document.getElementById("toast-container");

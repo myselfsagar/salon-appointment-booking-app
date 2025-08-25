@@ -155,9 +155,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // --- Staff Management Functions ---
   async function fetchStaff() {
     try {
-      const response = await axios.get("/staff", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await api.get("/staff");
       renderStaffList(response.data.data);
     } catch (error) {
       console.error("Failed to fetch staff:", error);
@@ -230,12 +228,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     try {
       const [servicesResponse, staffResponse] = await Promise.all([
-        axios.get("/services", {
-          headers: { Authorization: `Bearer ${token}` },
-        }),
-        axios.get(`/staff/${staffId}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        }),
+        api.get("/services"),
+        api.get(`/staff/${staffId}`),
       ]);
 
       const allServices = servicesResponse.data.data;
@@ -280,16 +274,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const id = card.dataset.id;
 
     if (e.target.classList.contains("edit-btn")) {
-      const response = await axios.get(`/staff/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await api.get(`/staff/${id}`);
       showStaffModal(response.data.data);
     } else if (e.target.classList.contains("delete-btn")) {
       if (confirm("Are you sure you want to delete this staff member?")) {
         try {
-          await axios.delete(`/staff/${id}`, {
-            headers: { Authorization: `Bearer ${token}` },
-          });
+          await api.delete(`/staff/${id}`);
           fetchStaff();
         } catch (error) {
           alert("Failed to delete staff member.");
@@ -363,13 +353,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     try {
       if (id) {
-        await axios.put(`/staff/${id}`, data, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        await api.put(`/staff/${id}`, data);
       } else {
-        await axios.post("/staff", data, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        await api.post("/staff", data);
       }
       staffModal.style.display = "none";
       fetchStaff();
@@ -388,9 +374,7 @@ document.addEventListener("DOMContentLoaded", () => {
     );
 
     try {
-      const staffResponse = await axios.get(`/staff/${currentStaffId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const staffResponse = await api.get(`/staff/${currentStaffId}`);
       const originalAssignedIds = new Set(
         staffResponse.data.data.services.map((s) => s.id)
       );
@@ -399,22 +383,14 @@ document.addEventListener("DOMContentLoaded", () => {
       for (const id of assignedServiceIds) {
         if (!originalAssignedIds.has(id)) {
           promises.push(
-            axios.post(
-              `/staff/${currentStaffId}/services/${id}`,
-              {},
-              { headers: { Authorization: `Bearer ${token}` } }
-            )
+            api.post(`/staff/${currentStaffId}/services/${id}`, {})
           );
         }
       }
 
       for (const id of originalAssignedIds) {
         if (!assignedServiceIds.has(id)) {
-          promises.push(
-            axios.delete(`/staff/${currentStaffId}/services/${id}`, {
-              headers: { Authorization: `Bearer ${token}` },
-            })
-          );
+          promises.push(api.delete(`/staff/${currentStaffId}/services/${id}`));
         }
       }
 

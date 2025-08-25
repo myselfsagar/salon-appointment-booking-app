@@ -7,11 +7,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   try {
-    const response = await axios.get("/services", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const response = await api.get("/services");
 
     const services = response.data.data;
     if (services.length === 0) {

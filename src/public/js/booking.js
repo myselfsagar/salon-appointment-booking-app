@@ -30,9 +30,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Fetch and display service details
   async function fetchServiceDetails() {
     try {
-      const response = await axios.get(`/services/${serviceId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await api.get(`/services/${serviceId}`);
       selectedService = response.data.data; // Store service details
       serviceDetailsContainer.innerHTML = `
         <h3>${selectedService.name}</h3>
@@ -51,9 +49,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     slotsContainer.innerHTML = "<p>Loading available slots...</p>";
     try {
-      const response = await axios.get("/appointments/slots", {
+      const response = await api.get("/appointments/slots", {
         params: { date: selectedDate, serviceId: serviceId },
-        headers: { Authorization: `Bearer ${token}` },
       });
 
       const slots = response.data.data.availableSlots;
@@ -117,11 +114,9 @@ document.addEventListener("DOMContentLoaded", () => {
   proceedToPaymentBtn.addEventListener("click", async () => {
     if (isReschedule) {
       try {
-        await axios.patch(
-          `/appointments/${appointmentId}/reschedule`,
-          { appointmentDateTime: selectedDateTime },
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
+        await api.patch(`/appointments/${appointmentId}/reschedule`, {
+          appointmentDateTime: selectedDateTime,
+        });
         alert("Appointment rescheduled successfully!");
         window.location.href = "/profile.html";
       } catch (error) {
@@ -134,14 +129,10 @@ document.addEventListener("DOMContentLoaded", () => {
     } else {
       try {
         // Step 1: Create an order on the backend
-        const response = await axios.post(
-          "/payments/create-order",
-          {
-            serviceId: selectedService.id,
-            appointmentDateTime: selectedDateTime,
-          },
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
+        const response = await api.post("/payments/create-order", {
+          serviceId: selectedService.id,
+          appointmentDateTime: selectedDateTime,
+        });
         const orderDetails = response.data.data;
 
         // Step 2: Configure and open Razorpay
@@ -155,15 +146,11 @@ document.addEventListener("DOMContentLoaded", () => {
           handler: async function (response) {
             // Step 3: Verify the payment
             try {
-              await axios.post(
-                "/payments/verify-payment",
-                {
-                  razorpay_payment_id: response.razorpay_payment_id,
-                  razorpay_order_id: response.razorpay_order_id,
-                  razorpay_signature: response.razorpay_signature,
-                },
-                { headers: { Authorization: `Bearer ${token}` } }
-              );
+              await api.post("/payments/verify-payment", {
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_signature: response.razorpay_signature,
+              });
               alert("Payment successful! Your appointment is scheduled.");
               window.location.href = "/profile.html";
             } catch (error) {

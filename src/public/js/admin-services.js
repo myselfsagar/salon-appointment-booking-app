@@ -25,9 +25,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Fetch and render all services
   async function fetchServices() {
     try {
-      const response = await axios.get("/services", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await api.get("/services");
       renderServiceList(response.data.data);
     } catch (error) {
       console.error("Failed to fetch services:", error);
@@ -106,18 +104,14 @@ document.addEventListener("DOMContentLoaded", () => {
     const id = card.dataset.id;
 
     if (e.target.classList.contains("edit-btn")) {
-      const response = await axios.get(`/services/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await api.get(`/services/${id}`);
       showServiceModal(response.data.data);
     }
 
     if (e.target.classList.contains("delete-btn")) {
       if (confirm("Are you sure you want to delete this service?")) {
         try {
-          await axios.delete(`/services/${id}`, {
-            headers: { Authorization: `Bearer ${token}` },
-          });
+          await api.delete(`/services/${id}`);
           fetchServices(); // Refresh list
         } catch (error) {
           alert("Failed to delete service.");
@@ -142,14 +136,10 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       if (id) {
         // Update existing service
-        await axios.put(`/services/${id}`, data, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        await api.put(`/services/${id}`, data);
       } else {
         // Create new service
-        await axios.post("/services", data, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        await api.post("/services", data);
       }
       serviceModal.style.display = "none";
       fetchServices(); // Refresh list

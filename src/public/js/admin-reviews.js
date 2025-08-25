@@ -15,9 +15,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   async function fetchReviews() {
     try {
-      const response = await axios.get("/reviews", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await api.get("/reviews");
       renderReviewList(response.data.data);
     } catch (error) {
       reviewListContainer.innerHTML = "<p>Failed to load reviews.</p>";
@@ -95,11 +93,9 @@ document.addEventListener("DOMContentLoaded", () => {
     ).value;
 
     try {
-      await axios.patch(
-        `/reviews/${reviewId}/respond`,
-        { response: responseText },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      await api.patch(`/reviews/${reviewId}/respond`, {
+        response: responseText,
+      });
       alert("Response submitted successfully!");
       responseModal.style.display = "none";
       fetchReviews();

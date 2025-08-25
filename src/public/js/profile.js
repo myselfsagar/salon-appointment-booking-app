@@ -16,9 +16,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   async function fetchProfile() {
     try {
-      const response = await axios.get("/users/me", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await api.get("/users/me");
       renderProfile(response.data.data);
     } catch (error) {
       profileContainer.innerHTML = "<p>Could not load profile.</p>";
@@ -62,9 +60,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const data = Object.fromEntries(formData.entries());
 
     try {
-      await axios.put("/users/me", data, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      await api.put("/users/me", data);
       profileMessage.textContent = "Profile updated successfully!";
       profileMessage.className = "form-message success";
       profileMessage.style.display = "block";
@@ -81,9 +77,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   async function fetchAppointments() {
     try {
-      const response = await axios.get("/appointments/me", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await api.get("/appointments/me");
       renderAppointments(response.data.data);
     } catch (error) {
       appointmentsContainer.innerHTML = "<p>Could not load appointments.</p>";
@@ -203,13 +197,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (target.classList.contains("cancel-btn")) {
       if (confirm("Are you sure you want to cancel this appointment?")) {
         try {
-          await axios.patch(
-            `/appointments/${appointmentId}/cancel`,
-            {},
-            {
-              headers: { Authorization: `Bearer ${token}` },
-            }
-          );
+          await api.patch(`/appointments/${appointmentId}/cancel`, {});
           alert("Appointment cancelled successfully.");
           fetchAppointments(); // Refresh the list
         } catch (error) {
@@ -277,15 +265,11 @@ document.addEventListener("DOMContentLoaded", () => {
     e.preventDefault();
     const reviewMessage = document.getElementById("review-message");
     try {
-      const response = await axios.post(
-        "/reviews",
-        {
-          appointmentId: document.getElementById("review-appointment-id").value,
-          rating: document.getElementById("rating-value").value,
-          comment: document.getElementById("review-comment").value,
-        },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      const response = await api.post("/reviews", {
+        appointmentId: document.getElementById("review-appointment-id").value,
+        rating: document.getElementById("rating-value").value,
+        comment: document.getElementById("review-comment").value,
+      });
 
       reviewMessage.textContent = "Review submitted successfully!";
       reviewMessage.className = "form-message success";

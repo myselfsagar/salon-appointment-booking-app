@@ -22,10 +22,8 @@ document.addEventListener("DOMContentLoaded", () => {
   async function populateFilters() {
     try {
       const [servicesRes, staffRes] = await Promise.all([
-        axios.get("/services", {
-          headers: { Authorization: `Bearer ${token}` },
-        }),
-        axios.get("/staff", { headers: { Authorization: `Bearer ${token}` } }),
+        api.get("/services"),
+        api.get("/staff"),
       ]);
 
       // Populate services
@@ -52,7 +50,6 @@ document.addEventListener("DOMContentLoaded", () => {
   async function fetchAppointments() {
     try {
       const config = {
-        headers: { Authorization: `Bearer ${token}` },
         params: {
           date: dateFilter.value || undefined,
           serviceId: serviceFilter.value || undefined,
@@ -62,7 +59,7 @@ document.addEventListener("DOMContentLoaded", () => {
         },
       };
 
-      const response = await axios.get("/appointments", config);
+      const response = await api.get("/appointments", config);
       const {
         appointments,
         totalPages,
@@ -188,13 +185,9 @@ document.addEventListener("DOMContentLoaded", () => {
       const newStatus = e.target.value;
 
       try {
-        await axios.patch(
-          `/appointments/${appointmentId}`,
-          { status: newStatus },
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
+        await api.patch(`/appointments/${appointmentId}`, {
+          status: newStatus,
+        });
         showToast("Status updated successfully!", "success");
       } catch (error) {
         showToast("Failed to update status.", "error");

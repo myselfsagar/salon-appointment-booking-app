@@ -17,9 +17,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Fetch and render all customers
   async function fetchCustomers() {
     try {
-      const response = await axios.get("/users", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await api.get("/users");
       renderCustomerList(response.data.data);
     } catch (error) {
       console.error("Failed to fetch customers:", error);
@@ -75,9 +73,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (e.target.classList.contains("edit-btn")) {
       try {
-        const response = await axios.get(`/users/${id}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const response = await api.get(`/users/${id}`);
         showCustomerModal(response.data.data);
       } catch (error) {
         alert("Could not fetch customer details.");
@@ -96,9 +92,7 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     try {
-      await axios.put(`/users/${id}`, data, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      await api.put(`/users/${id}`, data);
       customerModal.style.display = "none";
       fetchCustomers(); // Refresh list
     } catch (error) {
